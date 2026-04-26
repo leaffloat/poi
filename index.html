@@ -381,8 +381,8 @@
         
         <div class="tabs">
             <button class="tab active" data-tab="personal">个人信息</button>
+            <button class="tab" data-tab="relations">辈分完善</button>
             <button class="tab" data-tab="query">辈分查询</button>
-            <button class="tab" data-tab="data">数据管理</button>
         </div>
         
         <div class="content">
@@ -429,6 +429,19 @@
                 </div>
             </div>
             
+            <!-- 辈分完善面板 -->
+            <div class="panel" id="relations">
+                <div class="section">
+                    <h2 class="section-title">完善你的家庭关系</h2>
+                    <p style="font-size:13px;color:#999;margin-bottom:16px;">填写家人信息，帮助系统更准确地计算辈分和称呼</p>
+                    <div id="relationList"></div>
+                    <button class="btn btn-secondary" onclick="addRelationEntry()" style="width:100%;margin-top:8px;">+ 添加关系人</button>
+                </div>
+                <div class="btn-group" style="margin-top:12px;">
+                    <button class="btn btn-primary" onclick="saveRelations()">保存关系人</button>
+                </div>
+            </div>
+            
             <!-- 辈分查询面板 -->
             <div class="panel" id="query">
                 <div class="query-section">
@@ -446,43 +459,7 @@
                 </div>
             </div>
             
-            <!-- 数据管理面板 -->
-            <div class="panel" id="data">
-                <div class="section">
-                    <h2 class="section-title">当前身份</h2>
-                    <div style="background:#f0f7ff;border-radius:8px;padding:16px;margin-bottom:12px;">
-                        <p style="font-size:15px;color:#333;margin-bottom:8px;">👤 当前用户：<strong id="currentUserInfo">未登录</strong></p>
-                        <div class="btn-group">
-                            <button class="btn btn-secondary" onclick="switchUser()">🔄 切换用户</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2 class="section-title">数据操作</h2>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" onclick="exportData()">导出数据</button>
-                        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">导入数据</button>
-                        <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2 class="section-title">多人共享</h2>
-                    <div style="background:#f0fff0;border-radius:8px;padding:16px;margin-bottom:12px;">
-                        <p style="font-size:13px;color:#333;margin-bottom:8px;">📡 数据自动同步到 GitHub，多人共用互不干扰</p>
-                        <p style="font-size:12px;color:#999;">每人独立文件，读取无需密钥，写入需要密钥（找群主要）</p>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" onclick="showTokenModal()">⚙️ 设置写入密钥</button>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2 class="section-title">当前数据预览</h2>
-                    <pre id="dataPreview" style="background: #f5f5f5; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px;"></pre>
-                </div>
-            </div>
+
         </div>
     </div>
     
@@ -654,6 +631,42 @@
                 return;
             }
             
+            // 查找匹配的关系人
+            const rels = appData.relations;
+            let found = null;
+            if (Array.isArray(rels)) {
+                const match = rels.find(r => r && r.name === name);
+                if (match) found = { name: match.name, relation: match.relation };
+            } else if (typeof rels === 'object' && rels) {
+                const match = Object.values(rels).find(r => r && r.name === name);
+                if (match) found = { name: match.name, relation: match.relation || '' };
+            }
+            
+            if (found && found.relation) {
+                const mapped = queryRelations[found.relation];
+                if (mapped) {
+                    const out = relationOutput[mapped.key];
+                    if (out) {
+                        const myGender = appData.personal.gender || '男';
+                        showQueryResult({
+                            name: found.name,
+                            relation: out.relation,
+                            callHim: out.callHim,
+                            callMe: myGender === '男' ? out.callMeMale : out.callMeFemale
+                        });
+                        return;
+                    }
+                }
+                // 自定义关系，直接显示
+                showQueryResult({
+                    name: found.name,
+                    relation: found.relation,
+                    callHim: found.relation,
+                    callMe: appData.personal.name || '我'
+                });
+                return;
+            }
+            
             // 查找是否是其他注册用户
             if (allUsersCache[name]) {
                 const otherData = await loadOtherUserData(name);
@@ -794,7 +807,71 @@
             showToast('个人信息已保存');
         }
         
-        // ===== 关系人功能已移除，仅保留查询 =====
+        // ===== 辈分完善 - 动态关系人管理 =====
+        const RELATION_OPTIONS = ['父亲', '母亲', '爷爷', '奶奶', '配偶'];
+        let relCount = 0;
+        
+        function addRelationEntry(name, relation, otherRelation) {
+            relCount++;
+            const id = relCount;
+            const isFirst = document.getElementById('relationList').children.length === 0;
+            const div = document.createElement('div');
+            div.className = 'person-card';
+            div.id = `rel-${id}`;
+            div.style.borderLeft = '4px solid #667eea';
+            div.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <input type="text" id="relName${id}" placeholder="${isFirst ? '填的越多查得越快' : '你和想查询的人最可能有关系的是谁？'}" 
+                        value="${name || ''}" 
+                        style="flex:1;min-width:120px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                    <select id="relType${id}" onchange="toggleOtherInput(${id})" 
+                        style="padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:80px;">
+                        <option value="">和你的关系</option>
+                        ${RELATION_OPTIONS.map(r => `<option value="${r}" ${relation === r ? 'selected' : ''}>${r}</option>`).join('')}
+                        <option value="其他" ${relation === '其他' || (relation && !RELATION_OPTIONS.includes(relation)) ? 'selected' : ''}>其他</option>
+                    </select>
+                    <input type="text" id="relOther${id}" placeholder="输入关系" value="${(relation && !RELATION_OPTIONS.includes(relation)) ? relation : (otherRelation || '')}" 
+                        style="display:${(relation === '其他' || (relation && !RELATION_OPTIONS.includes(relation))) ? 'inline-block' : 'none'};padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:80px;">
+                    <button class="btn btn-danger" style="padding:8px 12px;font-size:12px;" onclick="removeRelEntry(${id})">✕</button>
+                </div>
+            `;
+            document.getElementById('relationList').appendChild(div);
+        }
+        
+        function toggleOtherInput(id) {
+            const sel = document.getElementById(`relType${id}`);
+            const other = document.getElementById(`relOther${id}`);
+            other.style.display = sel.value === '其他' ? 'inline-block' : 'none';
+            if (sel.value !== '其他') other.value = '';
+        }
+        
+        function removeRelEntry(id) {
+            const el = document.getElementById(`rel-${id}`);
+            if (el) el.remove();
+        }
+        
+        function collectRelations() {
+            const relations = [];
+            document.querySelectorAll('#relationList .person-card').forEach(card => {
+                const id = card.id.replace('rel-', '');
+                const name = document.getElementById(`relName${id}`)?.value.trim();
+                const type = document.getElementById(`relType${id}`)?.value || '';
+                const other = document.getElementById(`relOther${id}`)?.value.trim();
+                if (name) {
+                    relations.push({ 
+                        name, 
+                        relation: type === '其他' ? (other || '其他') : type
+                    });
+                }
+            });
+            return relations;
+        }
+        
+        function saveRelations() {
+            appData.relations = collectRelations();
+            saveData();
+            showToast('关系人信息已保存');
+        }
         
         // 数据存储
         const LOCAL_KEY = 'familyRelations_local';
@@ -901,6 +978,22 @@
                 document.getElementById('myNickname').value = appData.personal.nickname || '';
                 document.getElementById('myNetName').value = appData.personal.netName || '';
             }
+            // 加载关系人
+            const rels = appData.relations;
+            if (Array.isArray(rels) && rels.length > 0) {
+                rels.forEach(r => {
+                    if (r && r.name) {
+                        addRelationEntry(r.name, r.relation, r.relation === '其他' ? r.relation : '');
+                    }
+                });
+            } else if (typeof rels === 'object' && rels) {
+                Object.values(rels).forEach(r => {
+                    if (r && r.name) addRelationEntry(r.name, r.relation || '');
+                });
+            }
+            if (document.getElementById('relationList').children.length === 0) {
+                addRelationEntry();
+            }
         }
         
         // 导出数据
@@ -950,13 +1043,7 @@
         
         // 更新数据预览
         function updateDataPreview() {
-            const preview = document.getElementById('dataPreview');
-            preview.textContent = JSON.stringify(appData, null, 2);
-            // 更新用户显示
-            const userInfo = document.getElementById('currentUserInfo');
-            if (userInfo) {
-                userInfo.textContent = currentUserName || '未登录';
-            }
+            // 数据预览已移除，仅保留缓存更新
         }
         
         // ========== GitHub 多用户存储 ==========
