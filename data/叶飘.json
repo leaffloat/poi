@@ -8,9 +8,15 @@
   },
   "relations": [
     {
-      "name": "冬 贝利",
+      "name": "冬贝利",
       "gender": "",
       "callThem": "孙子",
+      "callMe": ""
+    },
+    {
+      "name": "年猪",
+      "gender": "男",
+      "callThem": "食物",
       "callMe": ""
     }
   ],
