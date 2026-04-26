@@ -6,6 +6,12 @@
     "nickname": "叶飘",
     "netName": "叶飘天下"
   },
-  "relations": {},
+  "relations": [
+    {
+      "name": "冬贝利",
+      "gender": "女",
+      "relation": "孙子"
+    }
+  ],
   "children": []
 }
