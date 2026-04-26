@@ -433,120 +433,15 @@
             <!-- 关系人面板 -->
             <div class="panel" id="relations">
                 <div class="section">
-                    <h2 class="section-title">长辈</h2>
-                    
-                    <div class="person-card">
-                        <h3>父亲 <span class="relation-badge">必填</span></h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>名字</label>
-                                <input type="text" id="fatherName">
-                            </div>
-                            <div class="form-group">
-                                <label>性别</label>
-                                <select id="fatherGender">
-                                    <option value="男">男</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>城市（可选）</label>
-                                <input type="text" id="fatherCity">
-                            </div>
-                            <div class="form-group">
-                                <label>代称（可选）</label>
-                                <input type="text" id="fatherNickname">
-                            </div>
-                        </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <h2 class="section-title" style="margin:0;">关系人</h2>
+                        <span style="font-size:12px;color:#999;">填的越多查得越快</span>
                     </div>
-                    
-                    <div class="person-card">
-                        <h3>母亲 <span class="relation-badge">必填</span></h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>名字</label>
-                                <input type="text" id="motherName">
-                            </div>
-                            <div class="form-group">
-                                <label>性别</label>
-                                <select id="motherGender">
-                                    <option value="女">女</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>城市（可选）</label>
-                                <input type="text" id="motherCity">
-                            </div>
-                            <div class="form-group">
-                                <label>代称（可选）</label>
-                                <input type="text" id="motherNickname">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="person-card">
-                        <h3>祖父（可选）</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>名字</label>
-                                <input type="text" id="grandfatherName">
-                            </div>
-                            <div class="form-group">
-                                <label>性别</label>
-                                <select id="grandfatherGender">
-                                    <option value="男">男</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="person-card">
-                        <h3>祖母（可选）</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>名字</label>
-                                <input type="text" id="grandmotherName">
-                            </div>
-                            <div class="form-group">
-                                <label>性别</label>
-                                <select id="grandmotherGender">
-                                    <option value="女">女</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="relationList"></div>
+                    <button class="btn btn-secondary" onclick="addRelationEntry()" style="width:100%;margin-top:8px;">+ 添加关系人</button>
                 </div>
                 
-                <div class="section">
-                    <h2 class="section-title">配偶（可选）</h2>
-                    <div class="person-card">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>名字</label>
-                                <input type="text" id="spouseName">
-                            </div>
-                            <div class="form-group">
-                                <label>性别</label>
-                                <select id="spouseGender">
-                                    <option value="">请选择</option>
-                                    <option value="男">男</option>
-                                    <option value="女">女</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2 class="section-title">子女（可选）</h2>
-                    <div id="childrenList"></div>
-                    <button class="btn btn-secondary" onclick="addChild()">+ 添加子女</button>
-                </div>
-                
-                <div class="btn-group">
+                <div class="btn-group" style="margin-top:12px;">
                     <button class="btn btn-primary" onclick="saveRelations()">保存关系人</button>
                 </div>
             </div>
@@ -557,14 +452,14 @@
                     <h3 style="margin-bottom: 12px;">输入对方名字查询</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <input type="text" id="queryName" placeholder="输入已配置的关系人名字">
+                            <input type="text" id="queryName" placeholder="输入名字查询关系">
                         </div>
                         <button class="btn btn-primary" onclick="queryByName()" style="height: 42px; min-width: 80px;">查询</button>
                     </div>
                 </div>
                 
                 <div class="query-section">
-                    <h3 style="margin-bottom: 12px;">或从列表选择</h3>
+                    <h3 style="margin-bottom: 12px;">你和想查询的人最可能有关系的是谁？</h3>
                     <div class="relation-grid" id="personGrid">
                         <!-- 动态生成已配置的关系人 -->
                     </div>
@@ -731,28 +626,28 @@
             grid.innerHTML = '';
             
             const persons = [];
+            const rels = appData.relations;
             
-            // 从关系人数据中提取
-            if (appData.relations) {
-                const rel = appData.relations;
-                if (rel.father && rel.father.name) persons.push({ name: rel.father.name, key: 'father', relation: '父亲' });
-                if (rel.mother && rel.mother.name) persons.push({ name: rel.mother.name, key: 'mother', relation: '母亲' });
-                if (rel.grandfather_paternal && rel.grandfather_paternal.name) persons.push({ name: rel.grandfather_paternal.name, key: 'grandfather_paternal', relation: '祖父' });
-                if (rel.grandmother_paternal && rel.grandmother_paternal.name) persons.push({ name: rel.grandmother_paternal.name, key: 'grandmother_paternal', relation: '祖母' });
-                if (rel.spouse && rel.spouse.name) persons.push({ name: rel.spouse.name, key: 'spouse', relation: '配偶', gender: rel.spouse.gender });
+            // 新格式：数组
+            if (Array.isArray(rels)) {
+                rels.forEach(r => {
+                    if (r && r.name) persons.push({ name: r.name, key: 'relation', gender: r.gender || '' });
+                });
+            } else if (typeof rels === 'object' && rels) {
+                // 兼容旧数据格式
+                Object.values(rels).forEach(r => {
+                    if (r && r.name) persons.push({ name: r.name, key: 'relation', gender: r.gender || '' });
+                });
             }
-            
-            // 从子女数据中提取
-            if (appData.children && appData.children.length > 0) {
-                appData.children.forEach((child, i) => {
-                    if (child.name) {
-                        persons.push({ name: child.name, key: 'child', relation: '子女', gender: child.gender, index: i });
-                    }
+            // 兼容旧 children
+            if (appData.children && Array.isArray(appData.children)) {
+                appData.children.forEach(c => {
+                    if (c && c.name) persons.push({ name: c.name, key: 'child', gender: c.gender || '' });
                 });
             }
             
             if (persons.length === 0) {
-                grid.innerHTML = '<p style="color: #999; text-align: center; grid-column: 1/-1;">暂无已配置的关系人</p>';
+                grid.innerHTML = '<p style="color: #999; text-align: center; grid-column: 1/-1;">暂无关系人，去「关系人」面板添加吧</p>';
                 return;
             }
             
@@ -820,23 +715,26 @@
                 return;
             }
             
-            // 查找匹配的人（先查自己的数据）
+            // 查找匹配的关系人（新格式：扁平数组）
             let found = null;
-            
-            if (appData.relations) {
-                const rel = appData.relations;
-                if (rel.father && rel.father.name === name) found = { key: 'father', relation: '父亲', gender: '男' };
-                else if (rel.mother && rel.mother.name === name) found = { key: 'mother', relation: '母亲', gender: '女' };
-                else if (rel.grandfather_paternal && rel.grandfather_paternal.name === name) found = { key: 'grandfather_paternal', relation: '祖父', gender: '男' };
-                else if (rel.grandmother_paternal && rel.grandmother_paternal.name === name) found = { key: 'grandmother_paternal', relation: '祖母', gender: '女' };
-                else if (rel.spouse && rel.spouse.name === name) found = { key: 'spouse', relation: '配偶', gender: rel.spouse.gender };
-            }
-            
-            // 查找子女
-            if (!found && appData.children) {
-                appData.children.forEach((child, i) => {
-                    if (child.name === name) found = { key: 'child', relation: '子女', gender: child.gender, index: i };
-                });
+            const rels = appData.relations;
+            if (Array.isArray(rels)) {
+                const match = rels.find(r => r && r.name === name);
+                if (match) found = { name: match.name, key: 'relation', gender: match.gender };
+            } else if (typeof rels === 'object' && rels) {
+                // 兼容旧格式
+                const keys = ['father', 'mother', 'grandfather_paternal', 'grandmother_paternal', 'spouse'];
+                for (const k of keys) {
+                    if (rels[k] && rels[k].name === name) {
+                        found = { name, key: k, gender: rels[k].gender };
+                        break;
+                    }
+                }
+                // 兼容旧 children
+                if (!found && appData.children) {
+                    const match = appData.children.find(c => c && c.name === name);
+                    if (match) found = { name: match.name, key: 'child', gender: match.gender };
+                }
             }
             
             if (found) {
@@ -876,6 +774,9 @@
         function showQueryResult(person) {
             const resultDiv = document.getElementById('queryResult');
             const myGender = appData.personal.gender || '男';
+            const myName = appData.personal.name || '我';
+            const queryName = person.name || '未知';
+            const pGender = person.gender || '未知';
             
             let relationType = '';
             let callHim = '';
@@ -884,68 +785,21 @@
             let note = person.note || '';
             let isSpecial = person.isSpecial || false;
             let isDefault = person.isDefault || false;
+            let isCrossUser = person.isCrossUser || false;
             
-            // 如果是特殊规则/默认规则，直接使用预设值
+            // 特殊规则/跨用户/默认规则，直接用预设值
             if (person.callHim && person.callMe) {
                 relationType = person.relation;
                 callHim = person.callHim;
                 callMe = person.callMe;
             } else {
-                // 根据关系key确定输出
-                switch (person.key) {
-                    case 'father':
-                        relationType = '父子关系';
-                        callHim = '爸爸';
-                        callMe = myGender === '男' ? '儿子' : '女儿';
-                        chain = [person.name || '父亲', '→ 爸爸', '→ 你（' + callMe + '）'];
-                        break;
-                    case 'mother':
-                        relationType = myGender === '男' ? '母子关系' : '母女关系';
-                        callHim = '妈妈';
-                        callMe = myGender === '男' ? '儿子' : '女儿';
-                        chain = [person.name || '母亲', '→ 妈妈', '→ 你（' + callMe + '）'];
-                        break;
-                    case 'grandfather_paternal':
-                        relationType = '祖孙关系';
-                        callHim = '爷爷';
-                        callMe = myGender === '男' ? '孙子' : '孙女';
-                        chain = [person.name || '祖父', '→ 爷爷', '→ 你（' + callMe + '）'];
-                        break;
-                    case 'grandmother_paternal':
-                        relationType = '祖孙关系';
-                        callHim = '奶奶';
-                        callMe = myGender === '男' ? '孙子' : '孙女';
-                        chain = [person.name || '祖母', '→ 奶奶', '→ 你（' + callMe + '）'];
-                        break;
-                    case 'spouse':
-                        relationType = '夫妻关系';
-                        if (person.gender === '男') {
-                            callHim = '老公';
-                            callMe = '老婆';
-                        } else {
-                            callHim = '老婆';
-                            callMe = '老公';
-                        }
-                        chain = [person.name || '配偶', '→ ' + callHim, '→ 你（' + callMe + '）'];
-                        break;
-                    case 'child':
-                        if (person.gender === '男') {
-                            relationType = myGender === '男' ? '父子关系' : '母子关系';
-                            callHim = '儿子';
-                            callMe = myGender === '男' ? '爸爸' : '妈妈';
-                        } else {
-                            relationType = myGender === '男' ? '父女关系' : '母女关系';
-                            callHim = '女儿';
-                            callMe = myGender === '男' ? '爸爸' : '妈妈';
-                        }
-                        chain = [person.name || '子女', '→ ' + callHim, '→ 你（' + callMe + '）'];
-                        break;
-                    default:
-                        relationType = '亲属关系';
-                        callHim = person.relation;
-                        callMe = '我';
-                        chain = [person.name, '→ ' + callHim];
-                }
+                // 通用关系人显示
+                relationType = '亲属关系';
+                callHim = queryName;
+                callMe = myName;
+                const genderIcon = pGender === '男' ? '👦' : pGender === '女' ? '👧' : '👤';
+                chain = [`${genderIcon} ${queryName}（${pGender}）`, `→ ${myName}（${myGender}）`];
+                note = '这是你配置的关系人';
             }
             
             const personName = person.name || appData.relations[person.key]?.name || '未知';
@@ -1027,84 +881,55 @@
             showToast('个人信息已保存');
         }
         
-        // 保存关系人
-        function saveRelations() {
-            appData.relations = {
-                father: {
-                    name: document.getElementById('fatherName').value,
-                    gender: '男',
-                    city: document.getElementById('fatherCity').value,
-                    nickname: document.getElementById('fatherNickname').value
-                },
-                mother: {
-                    name: document.getElementById('motherName').value,
-                    gender: '女',
-                    city: document.getElementById('motherCity').value,
-                    nickname: document.getElementById('motherNickname').value
-                },
-                grandfather_paternal: {
-                    name: document.getElementById('grandfatherName').value,
-                    gender: '男'
-                },
-                grandmother_paternal: {
-                    name: document.getElementById('grandmotherName').value,
-                    gender: '女'
-                },
-                spouse: {
-                    name: document.getElementById('spouseName').value,
-                    gender: document.getElementById('spouseGender').value
-                }
-            };
-            saveData();
-            showToast('关系人信息已保存');
-        }
+        // ===== 动态关系人管理 =====
+        let relCount = 0;
         
-        // 添加子女
-        let childCount = 0;
-        function addChild() {
-            childCount++;
+        function addRelationEntry(name, gender) {
+            relCount++;
+            const id = relCount;
             const div = document.createElement('div');
             div.className = 'person-card';
-            div.id = `child-${childCount}`;
+            div.id = `rel-${id}`;
+            div.style.borderLeft = '4px solid #667eea';
             div.innerHTML = `
-                <h3>子女 ${childCount} <button class="btn btn-danger" style="float:right;padding:4px 8px;font-size:12px;" onclick="removeChild(${childCount})">删除</button></h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>名字</label>
-                        <input type="text" id="childName${childCount}" onchange="saveChildrenData()">
-                    </div>
-                    <div class="form-group">
-                        <label>性别</label>
-                        <select id="childGender${childCount}" onchange="saveChildrenData()">
-                            <option value="">请选择</option>
-                            <option value="男">男</option>
-                            <option value="女">女</option>
-                        </select>
-                    </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="text" id="relName${id}" placeholder="名字（必填）" value="${name || ''}" 
+                        style="flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                    <select id="relGender${id}" style="padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:70px;">
+                        <option value="">性别</option>
+                        <option value="男" ${gender === '男' ? 'selected' : ''}>男</option>
+                        <option value="女" ${gender === '女' ? 'selected' : ''}>女</option>
+                    </select>
+                    <button class="btn btn-danger" style="padding:8px 12px;font-size:12px;" onclick="removeRelEntry(${id})">✕</button>
                 </div>
             `;
-            document.getElementById('childrenList').appendChild(div);
+            document.getElementById('relationList').appendChild(div);
         }
         
-        function removeChild(id) {
-            const el = document.getElementById(`child-${id}`);
+        function removeRelEntry(id) {
+            const el = document.getElementById(`rel-${id}`);
             if (el) el.remove();
-            saveChildrenData();
+            saveRelations();
         }
         
-        // 保存子女数据
-        function saveChildrenData() {
-            const children = [];
-            document.querySelectorAll('#childrenList .person-card').forEach((card, i) => {
-                const id = card.id.replace('child-', '');
-                const name = document.getElementById(`childName${id}`)?.value;
-                const gender = document.getElementById(`childGender${id}`)?.value;
+        // 收集所有关系人数据
+        function collectRelations() {
+            const relations = [];
+            document.querySelectorAll('#relationList .person-card').forEach((card) => {
+                const id = card.id.replace('rel-', '');
+                const name = document.getElementById(`relName${id}`)?.value.trim();
+                const gender = document.getElementById(`relGender${id}`)?.value || '';
                 if (name) {
-                    children.push({ name, gender, id: parseInt(id) });
+                    relations.push({ name, gender, id: parseInt(id) });
                 }
             });
-            appData.children = children;
+            return relations;
+        }
+        
+        function saveRelations() {
+            appData.relations = collectRelations();
             saveData();
+            showToast('关系人信息已保存');
         }
         
         // 数据存储
@@ -1212,38 +1037,27 @@
                 document.getElementById('myNickname').value = appData.personal.nickname || '';
                 document.getElementById('myNetName').value = appData.personal.netName || '';
             }
-            if (appData.relations) {
-                if (appData.relations.father) {
-                    document.getElementById('fatherName').value = appData.relations.father.name || '';
-                    document.getElementById('fatherCity').value = appData.relations.father.city || '';
-                    document.getElementById('fatherNickname').value = appData.relations.father.nickname || '';
-                }
-                if (appData.relations.mother) {
-                    document.getElementById('motherName').value = appData.relations.mother.name || '';
-                    document.getElementById('motherCity').value = appData.relations.mother.city || '';
-                    document.getElementById('motherNickname').value = appData.relations.mother.nickname || '';
-                }
-                if (appData.relations.grandfather_paternal) {
-                    document.getElementById('grandfatherName').value = appData.relations.grandfather_paternal.name || '';
-                }
-                if (appData.relations.grandmother_paternal) {
-                    document.getElementById('grandmotherName').value = appData.relations.grandmother_paternal.name || '';
-                }
-                if (appData.relations.spouse) {
-                    document.getElementById('spouseName').value = appData.relations.spouse.name || '';
-                    document.getElementById('spouseGender').value = appData.relations.spouse.gender || '';
+            // 加载关系人（新格式：数组）
+            const rels = appData.relations;
+            if (Array.isArray(rels) && rels.length > 0) {
+                rels.forEach(r => {
+                    if (r && r.name) addRelationEntry(r.name, r.gender);
+                });
+            } else if (typeof rels === 'object' && rels) {
+                // 兼容旧数据格式：转换为数组
+                Object.values(rels).forEach(r => {
+                    if (r && r.name) addRelationEntry(r.name, r.gender);
+                });
+                // 兼容旧 children
+                if (appData.children && Array.isArray(appData.children)) {
+                    appData.children.forEach(c => {
+                        if (c && c.name) addRelationEntry(c.name, c.gender);
+                    });
                 }
             }
-            // 加载子女
-            if (appData.children && appData.children.length > 0) {
-                appData.children.forEach((child, i) => {
-                    addChild();
-                    const id = child.id || (i + 1);
-                    const nameEl = document.getElementById(`childName${id}`);
-                    const genderEl = document.getElementById(`childGender${id}`);
-                    if (nameEl) nameEl.value = child.name || '';
-                    if (genderEl) genderEl.value = child.gender || '';
-                });
+            // 如果没有任何关系人，添加一个默认空行
+            if (document.getElementById('relationList').children.length === 0) {
+                addRelationEntry();
             }
         }
         
