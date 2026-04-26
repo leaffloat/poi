@@ -1049,11 +1049,11 @@
         // 保存个人信息
         function savePersonal() {
             appData.personal = {
-                name: document.getElementById('myName').value,
+                name: document.getElementById('myName').value.trim(),
                 gender: document.getElementById('myGender').value,
-                city: document.getElementById('myCity').value,
-                nickname: document.getElementById('myNickname').value,
-                netName: document.getElementById('myNetName').value
+                city: document.getElementById('myCity').value.trim(),
+                nickname: document.getElementById('myNickname').value.trim(),
+                netName: document.getElementById('myNetName').value.trim()
             };
             saveData();
             showToast('个人信息已保存');
