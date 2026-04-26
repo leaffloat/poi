@@ -381,7 +381,6 @@
         
         <div class="tabs">
             <button class="tab active" data-tab="personal">个人信息</button>
-            <button class="tab" data-tab="relations">关系人</button>
             <button class="tab" data-tab="query">辈分查询</button>
             <button class="tab" data-tab="data">数据管理</button>
         </div>
@@ -430,22 +429,6 @@
                 </div>
             </div>
             
-            <!-- 关系人面板 -->
-            <div class="panel" id="relations">
-                <div class="section">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-                        <h2 class="section-title" style="margin:0;">关系人</h2>
-                        <span style="font-size:12px;color:#999;">填的越多查得越快</span>
-                    </div>
-                    <div id="relationList"></div>
-                    <button class="btn btn-secondary" onclick="addRelationEntry()" style="width:100%;margin-top:8px;">+ 添加关系人</button>
-                </div>
-                
-                <div class="btn-group" style="margin-top:12px;">
-                    <button class="btn btn-primary" onclick="saveRelations()">保存关系人</button>
-                </div>
-            </div>
-            
             <!-- 辈分查询面板 -->
             <div class="panel" id="query">
                 <div class="query-section">
@@ -458,15 +441,8 @@
                     </div>
                 </div>
                 
-                <div class="query-section">
-                    <h3 style="margin-bottom: 12px;">你和想查询的人最可能有关系的是谁？</h3>
-                    <div class="relation-grid" id="personGrid">
-                        <!-- 动态生成已配置的关系人 -->
-                    </div>
-                </div>
-                
                 <div class="query-result" id="queryResult">
-                    <p style="color: #999; text-align: center;">请先在「关系人」面板配置家人信息，然后在此查询</p>
+                    <p style="color: #999; text-align: center;">输入名字开始查询</p>
                 </div>
             </div>
             
@@ -620,45 +596,8 @@
             });
         }
         
-        // 更新关系人选择网格
-        function updatePersonGrid() {
-            const grid = document.getElementById('personGrid');
-            grid.innerHTML = '';
-            
-            const persons = [];
-            const rels = appData.relations;
-            
-            // 新格式：数组
-            if (Array.isArray(rels)) {
-                rels.forEach(r => {
-                    if (r && r.name) persons.push({ name: r.name, key: 'relation', gender: r.gender || '' });
-                });
-            } else if (typeof rels === 'object' && rels) {
-                // 兼容旧数据格式
-                Object.values(rels).forEach(r => {
-                    if (r && r.name) persons.push({ name: r.name, key: 'relation', gender: r.gender || '' });
-                });
-            }
-            // 兼容旧 children
-            if (appData.children && Array.isArray(appData.children)) {
-                appData.children.forEach(c => {
-                    if (c && c.name) persons.push({ name: c.name, key: 'child', gender: c.gender || '' });
-                });
-            }
-            
-            if (persons.length === 0) {
-                grid.innerHTML = '<p style="color: #999; text-align: center; grid-column: 1/-1;">暂无关系人，去「关系人」面板添加吧</p>';
-                return;
-            }
-            
-            persons.forEach(p => {
-                const btn = document.createElement('button');
-                btn.className = 'relation-btn';
-                btn.textContent = p.name;
-                btn.onclick = () => queryPerson(p);
-                grid.appendChild(btn);
-            });
-        }
+        // 更新已完成（关系人网格已移除）
+        function updatePersonGrid() {}
         
         // 特殊规则（彩蛋）- 动态生成
         function getSpecialRules() {
@@ -715,32 +654,8 @@
                 return;
             }
             
-            // 查找匹配的关系人（新格式：扁平数组）
-            let found = null;
-            const rels = appData.relations;
-            if (Array.isArray(rels)) {
-                const match = rels.find(r => r && r.name === name);
-                if (match) found = { name: match.name, key: 'relation', gender: match.gender };
-            } else if (typeof rels === 'object' && rels) {
-                // 兼容旧格式
-                const keys = ['father', 'mother', 'grandfather_paternal', 'grandmother_paternal', 'spouse'];
-                for (const k of keys) {
-                    if (rels[k] && rels[k].name === name) {
-                        found = { name, key: k, gender: rels[k].gender };
-                        break;
-                    }
-                }
-                // 兼容旧 children
-                if (!found && appData.children) {
-                    const match = appData.children.find(c => c && c.name === name);
-                    if (match) found = { name: match.name, key: 'child', gender: match.gender };
-                }
-            }
-            
-            if (found) {
-                showQueryResult(found);
-            } else if (allUsersCache[name]) {
-                // 在其他用户的数据中查找
+            // 查找是否是其他注册用户
+            if (allUsersCache[name]) {
                 const otherData = await loadOtherUserData(name);
                 if (otherData) {
                     const otherPersonal = otherData.personal || {};
@@ -749,20 +664,18 @@
                         name: name,
                         callHim: name,
                         callMe: currentUserName,
-                        relation: `跨用户：${name} 的资料`,
-                        chain: [name, `→ 性别：${otherGender}`, `→ 城市：${otherPersonal.city || '未知'}`],
-                        note: `${name} 是其他用户，你可以查看 TA 的基本信息`,
+                        relation: `${name} 的资料`,
+                        chain: [`${otherGender === '男' ? '👦' : otherGender === '女' ? '👧' : '👤'} ${name}（${otherGender}）`, `→ 城市：${otherPersonal.city || '未知'}`, `→ 代称：${otherPersonal.nickname || '无'}`],
+                        note: `${name} 是注册用户`,
                         isCrossUser: true
                     });
-                } else {
-                    const defaultRule = getDefaultPeerRule();
-                    showQueryResult({ name, ...defaultRule, isDefault: true });
+                    return;
                 }
-            } else {
-                // 未找到 - 显示平辈规则
-                const defaultRule = getDefaultPeerRule();
-                showQueryResult({ name, ...defaultRule, isDefault: true });
             }
+            
+            // 未找到
+            const defaultRule = getDefaultPeerRule();
+            showQueryResult({ name, ...defaultRule, isDefault: true });
         }
         
         // 查询指定关系人
@@ -881,56 +794,7 @@
             showToast('个人信息已保存');
         }
         
-        // ===== 动态关系人管理 =====
-        let relCount = 0;
-        
-        function addRelationEntry(name, gender) {
-            relCount++;
-            const id = relCount;
-            const div = document.createElement('div');
-            div.className = 'person-card';
-            div.id = `rel-${id}`;
-            div.style.borderLeft = '4px solid #667eea';
-            div.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <input type="text" id="relName${id}" placeholder="名字（必填）" value="${name || ''}" 
-                        style="flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-                    <select id="relGender${id}" style="padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:70px;">
-                        <option value="">性别</option>
-                        <option value="男" ${gender === '男' ? 'selected' : ''}>男</option>
-                        <option value="女" ${gender === '女' ? 'selected' : ''}>女</option>
-                    </select>
-                    <button class="btn btn-danger" style="padding:8px 12px;font-size:12px;" onclick="removeRelEntry(${id})">✕</button>
-                </div>
-            `;
-            document.getElementById('relationList').appendChild(div);
-        }
-        
-        function removeRelEntry(id) {
-            const el = document.getElementById(`rel-${id}`);
-            if (el) el.remove();
-            saveRelations();
-        }
-        
-        // 收集所有关系人数据
-        function collectRelations() {
-            const relations = [];
-            document.querySelectorAll('#relationList .person-card').forEach((card) => {
-                const id = card.id.replace('rel-', '');
-                const name = document.getElementById(`relName${id}`)?.value.trim();
-                const gender = document.getElementById(`relGender${id}`)?.value || '';
-                if (name) {
-                    relations.push({ name, gender, id: parseInt(id) });
-                }
-            });
-            return relations;
-        }
-        
-        function saveRelations() {
-            appData.relations = collectRelations();
-            saveData();
-            showToast('关系人信息已保存');
-        }
+        // ===== 关系人功能已移除，仅保留查询 =====
         
         // 数据存储
         const LOCAL_KEY = 'familyRelations_local';
@@ -1036,28 +900,6 @@
                 document.getElementById('myCity').value = appData.personal.city || '';
                 document.getElementById('myNickname').value = appData.personal.nickname || '';
                 document.getElementById('myNetName').value = appData.personal.netName || '';
-            }
-            // 加载关系人（新格式：数组）
-            const rels = appData.relations;
-            if (Array.isArray(rels) && rels.length > 0) {
-                rels.forEach(r => {
-                    if (r && r.name) addRelationEntry(r.name, r.gender);
-                });
-            } else if (typeof rels === 'object' && rels) {
-                // 兼容旧数据格式：转换为数组
-                Object.values(rels).forEach(r => {
-                    if (r && r.name) addRelationEntry(r.name, r.gender);
-                });
-                // 兼容旧 children
-                if (appData.children && Array.isArray(appData.children)) {
-                    appData.children.forEach(c => {
-                        if (c && c.name) addRelationEntry(c.name, c.gender);
-                    });
-                }
-            }
-            // 如果没有任何关系人，添加一个默认空行
-            if (document.getElementById('relationList').children.length === 0) {
-                addRelationEntry();
             }
         }
         
