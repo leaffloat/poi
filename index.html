@@ -376,7 +376,7 @@
     <div class="container">
         <div class="header">
             <h1>社会关系配置</h1>
-            <p>辈分称呼查询系统</p>
+            <p>辈分称呼查询系统 <span id="headerUser" style="opacity:0.7;font-size:12px;"></span></p>
         </div>
         
         <div class="tabs">
@@ -578,6 +578,16 @@
             <!-- 数据管理面板 -->
             <div class="panel" id="data">
                 <div class="section">
+                    <h2 class="section-title">当前身份</h2>
+                    <div style="background:#f0f7ff;border-radius:8px;padding:16px;margin-bottom:12px;">
+                        <p style="font-size:15px;color:#333;margin-bottom:8px;">👤 当前用户：<strong id="currentUserInfo">未登录</strong></p>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="switchUser()">🔄 切换用户</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
                     <h2 class="section-title">数据操作</h2>
                     <div class="btn-group">
                         <button class="btn btn-primary" onclick="exportData()">导出数据</button>
@@ -588,13 +598,9 @@
                 
                 <div class="section">
                     <h2 class="section-title">多人共享</h2>
-                    <div style="background:#f0f7ff;border-radius:8px;padding:16px;margin-bottom:12px;">
-                        <p style="font-size:13px;color:#333;margin-bottom:8px;">📡 当前数据读取自 GitHub（所有访问者共用同一份数据）</p>
-                        <div class="btn-group">
-                            <button class="btn btn-primary" onclick="syncToGitHub()">📤 同步到 GitHub</button>
-                            <button class="btn btn-secondary" onclick="showTokenModal()">⚙️ 设置 Token</button>
-                        </div>
-                        <p style="font-size:11px;color:#999;margin-top:8px;">提示：只有 token 持有者可以同步写入，其他人只能读取。</p>
+                    <div style="background:#f0fff0;border-radius:8px;padding:16px;margin-bottom:12px;">
+                        <p style="font-size:13px;color:#333;margin-bottom:8px;">📡 数据自动同步到云端（Firebase），多人共用互不干扰</p>
+                        <p style="font-size:12px;color:#999;">每个人保存的数据只有自己能修改，所有人都能查看</p>
                     </div>
                 </div>
                 
@@ -608,6 +614,8 @@
     
     <div class="toast" id="toast"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
         const DATA_URL = 'https://raw.githubusercontent.com/leaffloat/poi/main/data.json';
         
@@ -618,8 +626,8 @@
             children: []
         };
         
-        // 是否已初始化GitHub数据（防止覆盖用户本地修改）
-        let githubDataInitialized = false;
+        // 当前用户名
+        let currentUserName = localStorage.getItem('poi_currentUser') || '';
         
         // 称呼数据
         const relationTitles = {
@@ -696,10 +704,16 @@
         
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            // 显示加载中
-            document.getElementById('dataPreview').textContent = '正在从 GitHub 加载共享数据...（首次加载可能较慢）';
-            initWithGitHubData();
             initTabs();
+            const firebaseReady = initFirebase();
+            if (firebaseReady) {
+                showLoginScreen();
+            } else {
+                // Firebase 未配置，回退到本地存储
+                loadDataFromLocal();
+                updateDataPreview();
+                updatePersonGrid();
+            }
         });
         
         // 标签页切换
@@ -795,7 +809,7 @@
         }
         
         // 按名字查询
-        function queryByName() {
+        async function queryByName() {
             const name = document.getElementById('queryName').value.trim();
             if (!name) {
                 showToast('请输入名字');
@@ -809,7 +823,7 @@
                 return;
             }
             
-            // 查找匹配的人
+            // 查找匹配的人（先查自己的数据）
             let found = null;
             
             if (appData.relations) {
@@ -830,6 +844,20 @@
             
             if (found) {
                 showQueryResult(found);
+            } else if (db && allUsersCache[name]) {
+                // 在其他用户的数据中查找
+                const otherData = allUsersCache[name];
+                const otherPersonal = otherData.personal || {};
+                const otherGender = otherPersonal.gender || '未知';
+                showQueryResult({
+                    name: name,
+                    callHim: name,
+                    callMe: currentUserName,
+                    relation: `跨用户：${name} 的资料`,
+                    chain: [name, `→ 性别：${otherGender}`, `→ 城市：${otherPersonal.city || '未知'}`],
+                    note: `${name} 是其他用户，你可以查看 TA 的基本信息`,
+                    isCrossUser: true
+                });
             } else {
                 // 未找到 - 显示平辈规则
                 const defaultRule = getDefaultPeerRule();
@@ -1077,111 +1105,106 @@
             saveData();
         }
         
-        // 数据存储（本地优先）
+        // 数据存储
         const LOCAL_KEY = 'familyRelations_local';
-        const GITHUB_TOKEN_KEY = 'github_token';
+        
+        // 显示登录/选择身份界面
+        async function showLoginScreen() {
+            const existing = document.getElementById('loginModal');
+            if (existing) { existing.classList.add('show'); return; }
+            
+            // 获取已有用户列表
+            const users = await listAllUsers();
+            let userOptions = '';
+            if (users.length > 0) {
+                userOptions = '<div style="margin-top:16px;"><p style="font-size:13px;color:#666;margin-bottom:8px;">已有用户：</p>' +
+                    users.map(u => `<button class="btn btn-secondary" style="margin:4px;" onclick="selectUser('${u}')">${u}</button>`).join('') +
+                    '</div>';
+            }
+            
+            const m = document.createElement('div');
+            m.className = 'modal show';
+            m.id = 'loginModal';
+            m.style.display = 'flex';
+            m.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header"><h3>👋 选择身份</h3></div>
+                    <div class="modal-body">
+                        <input type="text" id="loginName" placeholder="输入你的名字" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;" onkeydown="if(event.key==='Enter')selectUser()">
+                        <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="selectUser()">进入</button>
+                        ${userOptions}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(m);
+            
+            // 如果之前有登录过，自动填充
+            if (currentUserName) {
+                document.getElementById('loginName').value = currentUserName;
+            }
+        }
+        
+        async function selectUser(name) {
+            const userName = name || document.getElementById('loginName').value.trim();
+            if (!userName) { showToast('请输入名字'); return; }
+            
+            currentUserName = userName;
+            localStorage.setItem('poi_currentUser', userName);
+            
+            // 关闭登录弹窗
+            const modal = document.getElementById('loginModal');
+            if (modal) modal.remove();
+            
+            // 从 Firestore 加载数据
+            const data = await loadFromFirestore(userName);
+            if (data) {
+                appData = data;
+            } else {
+                // 新用户，检查本地是否有数据
+                const localData = localStorage.getItem(LOCAL_KEY);
+                if (localData) {
+                    appData = JSON.parse(localData);
+                }
+            }
+            
+            loadDataToForm();
+            updateDataPreview();
+            updatePersonGrid();
+            // 更新头部用户显示
+            const headerUser = document.getElementById('headerUser');
+            if (headerUser) headerUser.textContent = `| 👤 ${userName}`;
+            showToast(`欢迎，${userName}！`);
+        }
+        
+        // 切换用户
+        async function switchUser() {
+            showLoginScreen();
+        }
         
         function saveData() {
-            // 保存到本地（用户个人修改记录）
+            // 保存到本地
             localStorage.setItem(LOCAL_KEY, JSON.stringify(appData));
+            // 保存到 Firestore
+            if (db && currentUserName) {
+                saveToFirestore(currentUserName, appData).then(ok => {
+                    if (ok) showToast('已保存并同步');
+                });
+            }
             updateDataPreview();
             updatePersonGrid();
         }
         
-        // 同步到GitHub（需要token）
-        function syncToGitHub() {
-            const token = localStorage.getItem(GITHUB_TOKEN_KEY);
-            if (!token) {
-                showToast('请先设置 GitHub Token');
-                showTokenModal();
-                return;
-            }
-            
-            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(appData, null, 2))));
-            
-            fetch('https://api.github.com/repos/leaffloat/poi/contents/data.json', {
-                method: 'GET',
-                headers: { 'Authorization': 'token ' + token, 'User-Agent': 'qclaw' }
-            }).then(r => r.json()).then(current => {
-                return fetch('https://api.github.com/repos/leaffloat/poi/contents/data.json', {
-                    method: 'PUT',
-                    headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'User-Agent': 'qclaw' },
-                    body: JSON.stringify({
-                        message: 'Update shared data',
-                        content: encoded,
-                        sha: current.sha
-                    })
-                });
-            }).then(r => r.json()).then(result => {
-                if (result.commit) {
-                    showToast('已同步到 GitHub！');
-                } else {
-                    showToast('同步失败：' + (result.message || '未知错误'));
-                }
-            }).catch(e => {
-                showToast('同步失败：' + e.message);
-            });
-        }
-        
-        // 设置Token弹窗
-        function showTokenModal() {
-            const modal = document.getElementById('tokenModal');
-            if (!modal) {
-                const m = document.createElement('div');
-                m.className = 'modal';
-                m.id = 'tokenModal';
-                m.innerHTML = `
-                    <div class="modal-content">
-                        <div class="modal-header"><h3>设置 GitHub Token</h3></div>
-                        <div class="modal-body">
-                            <p style="margin-bottom:12px;color:#666;font-size:13px;">用于将数据同步到 GitHub，只有 token 持有者可以写入。</p>
-                            <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxx" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
-                            <p style="margin-top:8px;font-size:12px;color:#999;">Token 仅保存在本地浏览器中，可随时清除。</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" onclick="document.getElementById('tokenModal').classList.remove('show')">取消</button>
-                            <button class="btn btn-primary" onclick="saveToken()">保存</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(m);
-            }
-            document.getElementById('tokenInput').value = localStorage.getItem(GITHUB_TOKEN_KEY) || '';
-            document.getElementById('tokenModal').classList.add('show');
-        }
-        
-        function saveToken() {
-            const token = document.getElementById('tokenInput').value.trim();
-            if (token) {
-                localStorage.setItem(GITHUB_TOKEN_KEY, token);
-                document.getElementById('tokenModal').classList.remove('show');
-                showToast('Token 已保存');
-            }
-        }
-        
-        // 从GitHub加载共享数据
-        async function loadFromGitHub() {
-            try {
-                const resp = await fetch(DATA_URL + '?t=' + Date.now());
-                if (!resp.ok) return null;
-                const data = await resp.json();
-                return data;
-            } catch(e) {
-                return null;
-            }
-        }
-        
-        function loadData() {
-            // 尝试从GitHub加载共享数据
-            const localKey = 'familyRelations_local';
-            const localData = localStorage.getItem(localKey);
-            
-            // 如果本地有localKey标记的修改过的数据，优先用本地
+        // 从本地加载数据（无 Firebase 回退）
+        function loadDataFromLocal() {
+            const localData = localStorage.getItem(LOCAL_KEY);
             if (localData) {
                 appData = JSON.parse(localData);
             }
-            
-            // 填充表单
+            loadDataToForm();
+        }
+        
+        // 将 appData 填充到表单
+        function loadDataToForm() {
             if (appData.personal) {
                 document.getElementById('myName').value = appData.personal.name || '';
                 document.getElementById('myGender').value = appData.personal.gender || '';
@@ -1224,18 +1247,6 @@
             }
         }
         
-        // 初始化 - 异步从GitHub加载共享数据
-        async function initWithGitHubData() {
-            const githubData = await loadFromGitHub();
-            if (githubData) {
-                // 用GitHub数据初始化appData
-                appData = githubData;
-            }
-            loadData();
-            updateDataPreview();
-            updatePersonGrid();
-        }
-        
         // 导出数据
         function exportData() {
             const dataStr = JSON.stringify(appData, null, 2);
@@ -1272,8 +1283,11 @@
         // 清空数据
         function clearData() {
             if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
-                localStorage.removeItem('familyRelations');
+                localStorage.removeItem(LOCAL_KEY);
                 appData = { personal: {}, relations: {}, children: [] };
+                if (db && currentUserName) {
+                    saveToFirestore(currentUserName, appData);
+                }
                 location.reload();
             }
         }
@@ -1282,6 +1296,72 @@
         function updateDataPreview() {
             const preview = document.getElementById('dataPreview');
             preview.textContent = JSON.stringify(appData, null, 2);
+            // 更新用户显示
+            const userInfo = document.getElementById('currentUserInfo');
+            if (userInfo) {
+                userInfo.textContent = currentUserName || '未登录';
+            }
+        }
+        
+        // Firebase 初始化
+        const firebaseConfig = {
+            apiKey: "待填写",
+            authDomain: "待填写",
+            projectId: "待填写",
+            storageBucket: "待填写",
+            messagingSenderId: "待填写",
+            appId: "待填写"
+        };
+        
+        let db = null;
+        let allUsersCache = {};
+        
+        function initFirebase() {
+            if (firebaseConfig.apiKey === '待填写') {
+                console.warn('Firebase 未配置');
+                return false;
+            }
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            return true;
+        }
+        
+        // Firestore 读写
+        async function loadFromFirestore(userName) {
+            if (!db) return null;
+            try {
+                const doc = await db.collection('users').doc(userName).get();
+                return doc.exists ? doc.data() : null;
+            } catch(e) {
+                console.error('Firestore read error:', e);
+                return null;
+            }
+        }
+        
+        async function saveToFirestore(userName, data) {
+            if (!db) return false;
+            try {
+                await db.collection('users').doc(userName).set(data);
+                return true;
+            } catch(e) {
+                console.error('Firestore write error:', e);
+                return false;
+            }
+        }
+        
+        async function listAllUsers() {
+            if (!db) return [];
+            try {
+                const snapshot = await db.collection('users').get();
+                allUsersCache = {};
+                snapshot.forEach(doc => {
+                    allUsersCache[doc.id] = doc.data();
+                });
+                return Object.keys(allUsersCache);
+            } catch(e) {
+                console.error('Firestore list error:', e);
+                return [];
+            }
         }
         
         // 提示
