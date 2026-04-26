@@ -6,6 +6,13 @@
     "nickname": "叶飘",
     "netName": "叶飘天下"
   },
-  "relations": [],
+  "relations": [
+    {
+      "name": "死从天降",
+      "gender": "男",
+      "callThem": "老师",
+      "callMe": ""
+    }
+  ],
   "children": []
 }
