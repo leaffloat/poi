@@ -389,7 +389,7 @@
             <!-- 个人信息面板 -->
             <div class="panel active" id="personal">
                 <div class="section">
-                    <h2 class="section-title">基本信息(必填)</h2>
+                    <h2 class="section-title">基本信息</h2>
                     <div class="form-row">
                         <div class="form-group">
                             <label>名字</label>
@@ -628,33 +628,18 @@
             let found = null;
             if (Array.isArray(rels)) {
                 const match = rels.find(r => r && r.name === name);
-                if (match) found = { name: match.name, relation: match.relation };
+                if (match) found = { name: match.name, callThem: match.callThem, callMe: match.callMe };
             } else if (typeof rels === 'object' && rels) {
                 const match = Object.values(rels).find(r => r && r.name === name);
-                if (match) found = { name: match.name, relation: match.relation || '' };
+                if (match) found = { name: match.name, callThem: match.callThem || '', callMe: match.callMe || '' };
             }
 
-            if (found && found.relation) {
-                const mapped = queryRelations[found.relation];
-                if (mapped) {
-                    const out = relationOutput[mapped.key];
-                    if (out) {
-                        const myGender = appData.personal.gender || '男';
-                        showQueryResult({
-                            name: found.name,
-                            relation: out.relation,
-                            callHim: out.callHim,
-                            callMe: myGender === '男' ? out.callMeMale : out.callMeFemale
-                        });
-                        return;
-                    }
-                }
-                // 自定义关系,直接显示
+            if (found) {
                 showQueryResult({
                     name: found.name,
-                    relation: found.relation,
-                    callHim: found.relation,
-                    callMe: appData.personal.name || '我'
+                    relation: '已配置关系',
+                    callHim: found.callThem || '未设置',
+                    callMe: found.callMe || '未设置'
                 });
                 return;
             }
@@ -803,7 +788,7 @@
         const RELATION_OPTIONS = ['父亲', '母亲', '爷爷', '奶奶', '配偶'];
         let relCount = 0;
 
-        function addRelationEntry(name, relation, otherRelation, gender) {
+        function addRelationEntry(name, callThem, callMe, gender) {
             relCount++;
             const id = relCount;
             const isFirst = document.getElementById('relationList').children.length === 0;
@@ -822,7 +807,9 @@
                         <option value="男" ${(typeof gender !== 'undefined' && gender === '男') ? 'selected' : ''}>男</option>
                         <option value="女" ${(typeof gender !== 'undefined' && gender === '女') ? 'selected' : ''}>女</option>
                     </select>
-                    <input type="text" id="relRelation${id}" placeholder="和你的关系" value="${relation || ''}"
+                    <input type="text" id="relCallThem${id}" placeholder="你称呼ta" value="${callThem || ''}"
+                        style="flex:1;min-width:80px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                    <input type="text" id="relCallMe${id}" placeholder="ta称呼你" value="${callMe || ''}"
                         style="flex:1;min-width:80px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
                     <button class="btn btn-danger" style="padding:8px 12px;font-size:12px;" onclick="removeRelEntry(${id})">✕</button>
                 </div>
@@ -841,12 +828,14 @@
                 const id = card.id.replace('rel-', '');
                 const name = document.getElementById(`relName${id}`)?.value.trim();
                 const gender = document.getElementById(`relGender${id}`)?.value || '';
-                const relation = document.getElementById(`relRelation${id}`)?.value.trim();
+                const callThem = document.getElementById(`relCallThem${id}`)?.value.trim();
+                const callMe = document.getElementById(`relCallMe${id}`)?.value.trim();
                 if (name) {
                     relations.push({ 
                         name, 
                         gender,
-                        relation: relation || ''
+                        callThem: callThem || '',
+                        callMe: callMe || ''
                     });
                 }
             });
@@ -969,12 +958,12 @@
             if (Array.isArray(rels) && rels.length > 0) {
                 rels.forEach(r => {
                     if (r && r.name) {
-                        addRelationEntry(r.name, r.relation, '', r.gender || '');
+                        addRelationEntry(r.name, r.callThem || '', r.callMe || '', r.gender || '');
                     }
                 });
             } else if (typeof rels === 'object' && rels) {
                 Object.values(rels).forEach(r => {
-                    if (r && r.name) addRelationEntry(r.name, r.relation || '');
+                    if (r && r.name) addRelationEntry(r.name, r.callThem || '', r.callMe || '');
                 });
             }
             if (document.getElementById('relationList').children.length === 0) {
