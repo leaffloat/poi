@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社会关系配置 - 辈分版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 80px;
+            padding: 14px 16px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            background: #f5f5f5;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 24px;
+        }
+        
+        .panel {
+            display: none;
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #ff3344;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .person-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .person-card h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        
+        .relation-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 查询面板 */
+        .query-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .query-result {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            color: #666;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 关系选择器 */
+        .relation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+            margin: 16px 0;
+        }
+        
+        .relation-btn {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .relation-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .relation-btn.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        /* 表格 */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 16px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+        }
+        
+        /* 提示 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>社会关系配置</h1>
+            <p>辈分称呼查询系统</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="personal">个人信息</button>
+            <button class="tab" data-tab="relations">关系人</button>
+            <button class="tab" data-tab="query">辈分查询</button>
+            <button class="tab" data-tab="table">称呼表</button>
+            <button class="tab" data-tab="data">数据管理</button>
+        </div>
+        
+        <div class="content">
+            <!-- 个人信息面板 -->
+            <div class="panel active" id="personal">
+                <div class="section">
+                    <h2 class="section-title">基本信息（必填）</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>名字</label>
+                            <input type="text" id="myName" placeholder="真实姓名">
+                        </div>
+                        <div class="form-group">
+                            <label>性别</label>
+                            <select id="myGender">
+                                <option value="">请选择</option>
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>城市</label>
+                        <input type="text" id="myCity" placeholder="所在城市">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">附加信息（可选）</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>圈子代称</label>
+                            <input type="text" id="myNickname" placeholder="圈子里叫什么">
+                        </div>
+                        <div class="form-group">
+                            <label>网络称呼</label>
+                            <input type="text" id="myNetName" placeholder="网名/昵称">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="savePersonal()">保存信息</button>
+                </div>
+            </div>
+            
+            <!-- 关系人面板 -->
+            <div class="panel" id="relations">
+                <div class="section">
+                    <h2 class="section-title">长辈</h2>
+                    
+                    <div class="person-card">
+                        <h3>父亲 <span class="relation-badge">必填</span></h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>名字</label>
+                                <input type="text" id="fatherName">
+                            </div>
+                            <div class="form-group">
+                                <label>性别</label>
+                                <select id="fatherGender">
+                                    <option value="男">男</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>城市（可选）</label>
+                                <input type="text" id="fatherCity">
+                            </div>
+                            <div class="form-group">
+                                <label>代称（可选）</label>
+                                <input type="text" id="fatherNickname">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="person-card">
+                        <h3>母亲 <span class="relation-badge">必填</span></h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>名字</label>
+                                <input type="text" id="motherName">
+                            </div>
+                            <div class="form-group">
+                                <label>性别</label>
+                                <select id="motherGender">
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>城市（可选）</label>
+                                <input type="text" id="motherCity">
+                            </div>
+                            <div class="form-group">
+                                <label>代称（可选）</label>
+                                <input type="text" id="motherNickname">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="person-card">
+                        <h3>祖父（可选）</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>名字</label>
+                                <input type="text" id="grandfatherName">
+                            </div>
+                            <div class="form-group">
+                                <label>性别</label>
+                                <select id="grandfatherGender">
+                                    <option value="男">男</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="person-card">
+                        <h3>祖母（可选）</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>名字</label>
+                                <input type="text" id="grandmotherName">
+                            </div>
+                            <div class="form-group">
+                                <label>性别</label>
+                                <select id="grandmotherGender">
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">配偶（可选）</h2>
+                    <div class="person-card">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>名字</label>
+                                <input type="text" id="spouseName">
+                            </div>
+                            <div class="form-group">
+                                <label>性别</label>
+                                <select id="spouseGender">
+                                    <option value="">请选择</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">子女（可选）</h2>
+                    <div id="childrenList"></div>
+                    <button class="btn btn-secondary" onclick="addChild()">+ 添加子女</button>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="saveRelations()">保存关系人</button>
+                </div>
+            </div>
+            
+            <!-- 辈分查询面板 -->
+            <div class="panel" id="query">
+                <div class="query-section">
+                    <h3 style="margin-bottom: 12px;">输入对方名字查询</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="queryName" placeholder="输入已配置的关系人名字">
+                        </div>
+                        <button class="btn btn-primary" onclick="queryByName()" style="height: 42px; min-width: 80px;">查询</button>
+                    </div>
+                </div>
+                
+                <div class="query-section">
+                    <h3 style="margin-bottom: 12px;">或从列表选择</h3>
+                    <div class="relation-grid" id="personGrid">
+                        <!-- 动态生成已配置的关系人 -->
+                    </div>
+                </div>
+                
+                <div class="query-result" id="queryResult">
+                    <p style="color: #999; text-align: center;">请先在「关系人」面板配置家人信息，然后在此查询</p>
+                </div>
+            </div>
+            
+            <!-- 称呼表面板 -->
+            <div class="panel" id="table">
+                <div class="section">
+                    <h2 class="section-title">长辈称呼</h2>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>关系</th><th>男</th><th>女</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>父亲的父亲</td><td>爷爷</td><td>-</td></tr>
+                                <tr><td>母亲的父亲</td><td>外公/姥爷</td><td>-</td></tr>
+                                <tr><td>父亲的母亲</td><td>-</td><td>奶奶</td></tr>
+                                <tr><td>母亲的母亲</td><td>-</td><td>外婆/姥姥</td></tr>
+                                <tr><td>父亲的哥哥</td><td>伯伯</td><td>伯母</td></tr>
+                                <tr><td>父亲的弟弟</td><td>叔叔</td><td>婶婶</td></tr>
+                                <tr><td>父亲的姐妹</td><td>姑妈/姑姑</td><td>姑父</td></tr>
+                                <tr><td>母亲的兄弟</td><td>舅舅</td><td>舅妈</td></tr>
+                                <tr><td>母亲的姐妹</td><td>姨妈</td><td>姨父</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">平辈称呼</h2>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>关系</th><th>男</th><th>女</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>配偶</td><td>老公/丈夫</td><td>老婆/妻子</td></tr>
+                                <tr><td>年长的兄弟姐妹</td><td>哥哥</td><td>姐姐</td></tr>
+                                <tr><td>年幼的兄弟姐妹</td><td>弟弟</td><td>妹妹</td></tr>
+                                <tr><td>配偶的兄弟</td><td>内兄/内弟/大舅子/小舅子</td><td>-</td></tr>
+                                <tr><td>配偶的姐妹</td><td>-</td><td>嫂子/弟妹/大姨子/小姨子</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">晚辈称呼</h2>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>关系</th><th>男</th><th>女</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>子女</td><td>儿子</td><td>女儿</td></tr>
+                                <tr><td>儿子的子女</td><td>孙子</td><td>孙女</td></tr>
+                                <tr><td>女儿的子女</td><td>外孙</td><td>外孙女</td></tr>
+                                <tr><td>兄弟的子女</td><td>侄子</td><td>侄女</td></tr>
+                                <tr><td>姐妹的子女</td><td>外甥</td><td>外甥女</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数据管理面板 -->
+            <div class="panel" id="data">
+                <div class="section">
+                    <h2 class="section-title">数据操作</h2>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="exportData()">导出数据</button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">导入数据</button>
+                        <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+                        <button class="btn btn-danger" onclick="clearData()">清空所有数据</button>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title">当前数据预览</h2>
+                    <pre id="dataPreview" style="background: #f5f5f5; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px;"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 数据存储
+        let appData = {
+            personal: {},
+            relations: {},
+            children: []
+        };
+        
+        // 称呼数据
+        const relationTitles = {
+            // 长辈
+            'father': { title: '父亲', call: '爸爸', gender: '男' },
+            'mother': { title: '母亲', call: '妈妈', gender: '女' },
+            'grandfather_paternal': { title: '祖父', call: '爷爷', gender: '男' },
+            'grandmother_paternal': { title: '祖母', call: '奶奶', gender: '女' },
+            'grandfather_maternal': { title: '外祖父', call: '外公/姥爷', gender: '男' },
+            'grandmother_maternal': { title: '外祖母', call: '外婆/姥姥', gender: '女' },
+            'uncle_paternal_older': { title: '伯父', call: '伯伯', gender: '男' },
+            'uncle_paternal_younger': { title: '叔父', call: '叔叔', gender: '男' },
+            'aunt_paternal': { title: '姑母', call: '姑姑', gender: '女' },
+            'uncle_maternal': { title: '舅父', call: '舅舅', gender: '男' },
+            'aunt_maternal': { title: '姨母', call: '姨妈', gender: '女' },
+            // 平辈
+            'spouse': { title: '配偶', maleCall: '老婆', femaleCall: '老公', gender: 'any' },
+            'older_brother': { title: '哥哥', call: '哥哥', gender: '男' },
+            'younger_brother': { title: '弟弟', call: '弟弟', gender: '男' },
+            'older_sister': { title: '姐姐', call: '姐姐', gender: '女' },
+            'younger_sister': { title: '妹妹', call: '妹妹', gender: '女' },
+            // 晚辈
+            'son': { title: '儿子', call: '儿子', gender: '男' },
+            'daughter': { title: '女儿', call: '女儿', gender: '女' },
+            'grandson': { title: '孙子', call: '孙子', gender: '男' },
+            'granddaughter': { title: '孙女', call: '孙女', gender: '女' },
+            'nephew_brother': { title: '侄子', call: '侄子', gender: '男' },
+            'niece_brother': { title: '侄女', call: '侄女', gender: '女' },
+            'nephew_sister': { title: '外甥', call: '外甥', gender: '男' },
+            'niece_sister': { title: '外甥女', call: '外甥女', gender: '女' }
+        };
+        
+        // 关系查询用
+        const queryRelations = {
+            '父亲': { key: 'father', call: '爸爸' },
+            '母亲': { key: 'mother', call: '妈妈' },
+            '祖父': { key: 'grandfather_paternal', call: '爷爷' },
+            '祖母': { key: 'grandmother_paternal', call: '奶奶' },
+            '外公': { key: 'grandfather_maternal', call: '外公' },
+            '外婆': { key: 'grandmother_maternal', call: '外婆' },
+            '伯伯': { key: 'uncle_paternal_older', call: '伯伯' },
+            '叔叔': { key: 'uncle_paternal_younger', call: '叔叔' },
+            '姑姑': { key: 'aunt_paternal', call: '姑姑' },
+            '舅舅': { key: 'uncle_maternal', call: '舅舅' },
+            '姨妈': { key: 'aunt_maternal', call: '姨妈' },
+            '配偶': { key: 'spouse', call: '老公/老婆' },
+            '哥哥': { key: 'older_brother', call: '哥哥' },
+            '弟弟': { key: 'younger_brother', call: '弟弟' },
+            '姐姐': { key: 'older_sister', call: '姐姐' },
+            '妹妹': { key: 'younger_sister', call: '妹妹' },
+            '儿子': { key: 'son', call: '儿子' },
+            '女儿': { key: 'daughter', call: '女儿' },
+            '孙子': { key: 'grandson', call: '孙子' },
+            '孙女': { key: 'granddaughter', call: '孙女' },
+            '侄子': { key: 'nephew_brother', call: '侄子' },
+            '侄女': { key: 'niece_brother', call: '侄女' },
+            '外甥': { key: 'nephew_sister', call: '外甥' },
+            '外甥女': { key: 'niece_sister', call: '外甥女' }
+        };
+        
+        // 关系映射表（关系key -> 输出信息）
+        const relationOutput = {
+            'father': { relation: '父子关系', callHim: '爸爸', callMeMale: '儿子', callMeFemale: '女儿' },
+            'mother': { relation: '母子关系', callHim: '妈妈', callMeMale: '儿子', callMeFemale: '女儿' },
+            'grandfather_paternal': { relation: '祖孙关系', callHim: '爷爷', callMeMale: '孙子', callMeFemale: '孙女' },
+            'grandmother_paternal': { relation: '祖孙关系', callHim: '奶奶', callMeMale: '孙子', callMeFemale: '孙女' },
+            'grandfather_maternal': { relation: '祖孙关系', callHim: '外公', callMeMale: '外孙', callMeFemale: '外孙女' },
+            'grandmother_maternal': { relation: '祖孙关系', callHim: '外婆', callMeMale: '外孙', callMeFemale: '外孙女' },
+            'spouse_male': { relation: '夫妻关系', callHim: '老公', callMeMale: '老婆', callMeFemale: '老公' },
+            'spouse_female': { relation: '夫妻关系', callHim: '老婆', callMeMale: '老婆', callMeFemale: '老公' },
+            'child_male': { relation: '父子关系', callHim: '儿子', callMeMale: '爸爸', callMeFemale: '妈妈' },
+            'child_female': { relation: '母女关系', callHim: '女儿', callMeMale: '爸爸', callMeFemale: '妈妈' }
+        };
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initTabs();
+            updatePersonGrid();
+            updateDataPreview();
+        });
+        
+        // 标签页切换
+        function initTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+        }
+        
+        // 更新关系人选择网格
+        function updatePersonGrid() {
+            const grid = document.getElementById('personGrid');
+            grid.innerHTML = '';
+            
+            const persons = [];
+            
+            // 从关系人数据中提取
+            if (appData.relations) {
+                const rel = appData.relations;
+                if (rel.father && rel.father.name) persons.push({ name: rel.father.name, key: 'father', relation: '父亲' });
+                if (rel.mother && rel.mother.name) persons.push({ name: rel.mother.name, key: 'mother', relation: '母亲' });
+                if (rel.grandfather_paternal && rel.grandfather_paternal.name) persons.push({ name: rel.grandfather_paternal.name, key: 'grandfather_paternal', relation: '祖父' });
+                if (rel.grandmother_paternal && rel.grandmother_paternal.name) persons.push({ name: rel.grandmother_paternal.name, key: 'grandmother_paternal', relation: '祖母' });
+                if (rel.spouse && rel.spouse.name) persons.push({ name: rel.spouse.name, key: 'spouse', relation: '配偶', gender: rel.spouse.gender });
+            }
+            
+            // 从子女数据中提取
+            if (appData.children && appData.children.length > 0) {
+                appData.children.forEach((child, i) => {
+                    if (child.name) {
+                        persons.push({ name: child.name, key: 'child', relation: '子女', gender: child.gender, index: i });
+                    }
+                });
+            }
+            
+            if (persons.length === 0) {
+                grid.innerHTML = '<p style="color: #999; text-align: center; grid-column: 1/-1;">暂无已配置的关系人</p>';
+                return;
+            }
+            
+            persons.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = 'relation-btn';
+                btn.textContent = p.name;
+                btn.onclick = () => queryPerson(p);
+                grid.appendChild(btn);
+            });
+        }
+        
+        // 按名字查询
+        function queryByName() {
+            const name = document.getElementById('queryName').value.trim();
+            if (!name) {
+                showToast('请输入名字');
+                return;
+            }
+            
+            // 查找匹配的人
+            let found = null;
+            
+            if (appData.relations) {
+                const rel = appData.relations;
+                if (rel.father && rel.father.name === name) found = { key: 'father', relation: '父亲', gender: '男' };
+                else if (rel.mother && rel.mother.name === name) found = { key: 'mother', relation: '母亲', gender: '女' };
+                else if (rel.grandfather_paternal && rel.grandfather_paternal.name === name) found = { key: 'grandfather_paternal', relation: '祖父', gender: '男' };
+                else if (rel.grandmother_paternal && rel.grandmother_paternal.name === name) found = { key: 'grandmother_paternal', relation: '祖母', gender: '女' };
+                else if (rel.spouse && rel.spouse.name === name) found = { key: 'spouse', relation: '配偶', gender: rel.spouse.gender };
+            }
+            
+            // 查找子女
+            if (!found && appData.children) {
+                appData.children.forEach((child, i) => {
+                    if (child.name === name) found = { key: 'child', relation: '子女', gender: child.gender, index: i };
+                });
+            }
+            
+            if (!found) {
+                document.getElementById('queryResult').innerHTML = `<p style="color: #ff4757; text-align: center;">未找到"${name}"，请先在「关系人」面板配置</p>`;
+                return;
+            }
+            
+            showQueryResult(found);
+        }
+        
+        // 查询指定关系人
+        function queryPerson(p) {
+            showQueryResult(p);
+        }
+        
+        // 显示查询结果
+        function showQueryResult(person) {
+            const resultDiv = document.getElementById('queryResult');
+            const myGender = appData.personal.gender || '男';
+            
+            let relationType = '';
+            let callHim = '';
+            let callMe = '';
+            
+            // 根据关系key确定输出
+            switch (person.key) {
+                case 'father':
+                    relationType = '父子关系';
+                    callHim = '爸爸';
+                    callMe = myGender === '男' ? '儿子' : '女儿';
+                    break;
+                case 'mother':
+                    relationType = myGender === '男' ? '母子关系' : '母女关系';
+                    callHim = '妈妈';
+                    callMe = myGender === '男' ? '儿子' : '女儿';
+                    break;
+                case 'grandfather_paternal':
+                    relationType = '祖孙关系';
+                    callHim = '爷爷';
+                    callMe = myGender === '男' ? '孙子' : '孙女';
+                    break;
+                case 'grandmother_paternal':
+                    relationType = '祖孙关系';
+                    callHim = '奶奶';
+                    callMe = myGender === '男' ? '孙子' : '孙女';
+                    break;
+                case 'spouse':
+                    relationType = '夫妻关系';
+                    if (person.gender === '男') {
+                        callHim = '老公';
+                        callMe = '老婆';
+                    } else {
+                        callHim = '老婆';
+                        callMe = '老公';
+                    }
+                    break;
+                case 'child':
+                    if (person.gender === '男') {
+                        relationType = myGender === '男' ? '父子关系' : '母子关系';
+                        callHim = '儿子';
+                        callMe = myGender === '男' ? '爸爸' : '妈妈';
+                    } else {
+                        relationType = myGender === '男' ? '父女关系' : '母女关系';
+                        callHim = '女儿';
+                        callMe = myGender === '男' ? '爸爸' : '妈妈';
+                    }
+                    break;
+                default:
+                    relationType = '亲属关系';
+                    callHim = person.relation;
+                    callMe = '我';
+            }
+            
+            const personName = person.name || appData.relations[person.key]?.name || '未知';
+            
+            resultDiv.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">姓名</span>
+                    <span class="result-value">${personName}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">关系类型</span>
+                    <span class="result-value" style="color: #667eea;">${relationType}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">我该叫他/她</span>
+                    <span class="result-value" style="color: #667eea; font-size: 18px;">${callHim}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">他/她该叫我</span>
+                    <span class="result-value" style="color: #764ba2; font-size: 18px;">${callMe}</span>
+                </div>
+            `;
+            
+            showToast('查询成功');
+        }
+        
+        // 保存个人信息
+        function savePersonal() {
+            appData.personal = {
+                name: document.getElementById('myName').value,
+                gender: document.getElementById('myGender').value,
+                city: document.getElementById('myCity').value,
+                nickname: document.getElementById('myNickname').value,
+                netName: document.getElementById('myNetName').value
+            };
+            saveData();
+            showToast('个人信息已保存');
+        }
+        
+        // 保存关系人
+        function saveRelations() {
+            appData.relations = {
+                father: {
+                    name: document.getElementById('fatherName').value,
+                    gender: '男',
+                    city: document.getElementById('fatherCity').value,
+                    nickname: document.getElementById('fatherNickname').value
+                },
+                mother: {
+                    name: document.getElementById('motherName').value,
+                    gender: '女',
+                    city: document.getElementById('motherCity').value,
+                    nickname: document.getElementById('motherNickname').value
+                },
+                grandfather_paternal: {
+                    name: document.getElementById('grandfatherName').value,
+                    gender: '男'
+                },
+                grandmother_paternal: {
+                    name: document.getElementById('grandmotherName').value,
+                    gender: '女'
+                },
+                spouse: {
+                    name: document.getElementById('spouseName').value,
+                    gender: document.getElementById('spouseGender').value
+                }
+            };
+            saveData();
+            showToast('关系人信息已保存');
+        }
+        
+        // 添加子女
+        let childCount = 0;
+        function addChild() {
+            childCount++;
+            const div = document.createElement('div');
+            div.className = 'person-card';
+            div.id = `child-${childCount}`;
+            div.innerHTML = `
+                <h3>子女 ${childCount} <button class="btn btn-danger" style="float:right;padding:4px 8px;font-size:12px;" onclick="removeChild(${childCount})">删除</button></h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>名字</label>
+                        <input type="text" id="childName${childCount}" onchange="saveChildrenData()">
+                    </div>
+                    <div class="form-group">
+                        <label>性别</label>
+                        <select id="childGender${childCount}" onchange="saveChildrenData()">
+                            <option value="">请选择</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            document.getElementById('childrenList').appendChild(div);
+        }
+        
+        function removeChild(id) {
+            const el = document.getElementById(`child-${id}`);
+            if (el) el.remove();
+            saveChildrenData();
+        }
+        
+        // 保存子女数据
+        function saveChildrenData() {
+            const children = [];
+            document.querySelectorAll('#childrenList .person-card').forEach((card, i) => {
+                const id = card.id.replace('child-', '');
+                const name = document.getElementById(`childName${id}`)?.value;
+                const gender = document.getElementById(`childGender${id}`)?.value;
+                if (name) {
+                    children.push({ name, gender, id: parseInt(id) });
+                }
+            });
+            appData.children = children;
+            saveData();
+        }
+        
+        // 数据存储
+        function saveData() {
+            localStorage.setItem('familyRelations', JSON.stringify(appData));
+            updateDataPreview();
+            updatePersonGrid();  // 刷新关系人列表
+        }
+        
+        function loadData() {
+            const saved = localStorage.getItem('familyRelations');
+            if (saved) {
+                appData = JSON.parse(saved);
+                // 填充表单
+                if (appData.personal) {
+                    document.getElementById('myName').value = appData.personal.name || '';
+                    document.getElementById('myGender').value = appData.personal.gender || '';
+                    document.getElementById('myCity').value = appData.personal.city || '';
+                    document.getElementById('myNickname').value = appData.personal.nickname || '';
+                    document.getElementById('myNetName').value = appData.personal.netName || '';
+                }
+                if (appData.relations) {
+                    if (appData.relations.father) {
+                        document.getElementById('fatherName').value = appData.relations.father.name || '';
+                        document.getElementById('fatherCity').value = appData.relations.father.city || '';
+                        document.getElementById('fatherNickname').value = appData.relations.father.nickname || '';
+                    }
+                    if (appData.relations.mother) {
+                        document.getElementById('motherName').value = appData.relations.mother.name || '';
+                        document.getElementById('motherCity').value = appData.relations.mother.city || '';
+                        document.getElementById('motherNickname').value = appData.relations.mother.nickname || '';
+                    }
+                    if (appData.relations.grandfather_paternal) {
+                        document.getElementById('grandfatherName').value = appData.relations.grandfather_paternal.name || '';
+                    }
+                    if (appData.relations.grandmother_paternal) {
+                        document.getElementById('grandmotherName').value = appData.relations.grandmother_paternal.name || '';
+                    }
+                    if (appData.relations.spouse) {
+                        document.getElementById('spouseName').value = appData.relations.spouse.name || '';
+                        document.getElementById('spouseGender').value = appData.relations.spouse.gender || '';
+                    }
+                }
+                // 加载子女
+                if (appData.children && appData.children.length > 0) {
+                    appData.children.forEach((child, i) => {
+                        addChild();
+                        const id = child.id || (i + 1);
+                        document.getElementById(`childName${id}`).value = child.name || '';
+                        document.getElementById(`childGender${id}`).value = child.gender || '';
+                    });
+                }
+            }
+        }
+        
+        // 导出数据
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `family-relations-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('数据已导出');
+        }
+        
+        // 导入数据
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    appData = JSON.parse(e.target.result);
+                    saveData();
+                    loadData();
+                    showToast('数据导入成功');
+                } catch (err) {
+                    showToast('导入失败：文件格式错误');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+        
+        // 清空数据
+        function clearData() {
+            if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+                localStorage.removeItem('familyRelations');
+                appData = { personal: {}, relations: {}, children: [] };
+                location.reload();
+            }
+        }
+        
+        // 更新数据预览
+        function updateDataPreview() {
+            const preview = document.getElementById('dataPreview');
+            preview.textContent = JSON.stringify(appData, null, 2);
+        }
+        
+        // 提示
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>
