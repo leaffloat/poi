@@ -8,9 +8,10 @@
   },
   "relations": [
     {
-      "name": "冬贝利",
-      "gender": "女",
-      "relation": "孙子"
+      "name": "冬 贝利",
+      "gender": "",
+      "callThem": "孙子",
+      "callMe": ""
     }
   ],
   "children": []
