@@ -6,19 +6,6 @@
     "nickname": "叶飘",
     "netName": "叶飘天下"
   },
-  "relations": [
-    {
-      "name": "冬贝利",
-      "gender": "",
-      "callThem": "孙子",
-      "callMe": ""
-    },
-    {
-      "name": "年猪",
-      "gender": "男",
-      "callThem": "侄子",
-      "callMe": ""
-    }
-  ],
+  "relations": [],
   "children": []
 }
