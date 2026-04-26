@@ -404,21 +404,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>城市</label>
-                        <input type="text" id="myCity" placeholder="所在城市">
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2 class="section-title">附加信息（可选）</h2>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>圈子代称</label>
+                            <label>圈子代称（可选）</label>
                             <input type="text" id="myNickname" placeholder="圈子里叫什么">
                         </div>
                         <div class="form-group">
-                            <label>网络称呼</label>
+                            <label>网络称呼（可选）</label>
                             <input type="text" id="myNetName" placeholder="网名/昵称">
                         </div>
                     </div>
@@ -678,7 +670,7 @@
                         callHim: name,
                         callMe: currentUserName,
                         relation: `${name} 的资料`,
-                        chain: [`${otherGender === '男' ? '👦' : otherGender === '女' ? '👧' : '👤'} ${name}（${otherGender}）`, `→ 城市：${otherPersonal.city || '未知'}`, `→ 代称：${otherPersonal.nickname || '无'}`],
+                        chain: [`${otherGender === '男' ? '👦' : otherGender === '女' ? '👧' : '👤'} ${name}（${otherGender}）`, `→ 代称：${otherPersonal.nickname || '无'}`],
                         note: `${name} 是注册用户`,
                         isCrossUser: true
                     });
@@ -799,7 +791,7 @@
             appData.personal = {
                 name: document.getElementById('myName').value.trim(),
                 gender: document.getElementById('myGender').value,
-                city: document.getElementById('myCity').value.trim(),
+
                 nickname: document.getElementById('myNickname').value.trim(),
                 netName: document.getElementById('myNetName').value.trim()
             };
@@ -811,7 +803,7 @@
         const RELATION_OPTIONS = ['父亲', '母亲', '爷爷', '奶奶', '配偶'];
         let relCount = 0;
         
-        function addRelationEntry(name, relation, otherRelation) {
+        function addRelationEntry(name, relation, otherRelation, gender) {
             relCount++;
             const id = relCount;
             const isFirst = document.getElementById('relationList').children.length === 0;
@@ -824,6 +816,12 @@
                     <input type="text" id="relName${id}" placeholder="${isFirst ? '填的越多查得越快' : '你和想查询的人最可能有关系的是谁？'}" 
                         value="${name || ''}" 
                         style="flex:1;min-width:120px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                    <select id="relGender${id}" 
+                        style="padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:60px;">
+                        <option value="">性别</option>
+                        <option value="男" ${(typeof gender !== 'undefined' && gender === '男') ? 'selected' : ''}>男</option>
+                        <option value="女" ${(typeof gender !== 'undefined' && gender === '女') ? 'selected' : ''}>女</option>
+                    </select>
                     <select id="relType${id}" onchange="toggleOtherInput(${id})" 
                         style="padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:80px;">
                         <option value="">和你的关系</option>
@@ -855,11 +853,13 @@
             document.querySelectorAll('#relationList .person-card').forEach(card => {
                 const id = card.id.replace('rel-', '');
                 const name = document.getElementById(`relName${id}`)?.value.trim();
+                const gender = document.getElementById(`relGender${id}`)?.value || '';
                 const type = document.getElementById(`relType${id}`)?.value || '';
                 const other = document.getElementById(`relOther${id}`)?.value.trim();
                 if (name) {
                     relations.push({ 
                         name, 
+                        gender,
                         relation: type === '其他' ? (other || '其他') : type
                     });
                 }
@@ -974,7 +974,7 @@
             if (appData.personal) {
                 document.getElementById('myName').value = appData.personal.name || '';
                 document.getElementById('myGender').value = appData.personal.gender || '';
-                document.getElementById('myCity').value = appData.personal.city || '';
+    
                 document.getElementById('myNickname').value = appData.personal.nickname || '';
                 document.getElementById('myNetName').value = appData.personal.netName || '';
             }
@@ -983,7 +983,7 @@
             if (Array.isArray(rels) && rels.length > 0) {
                 rels.forEach(r => {
                     if (r && r.name) {
-                        addRelationEntry(r.name, r.relation, r.relation === '其他' ? r.relation : '');
+                        addRelationEntry(r.name, r.relation, r.relation === '其他' ? r.relation : '', r.gender || '');
                     }
                 });
             } else if (typeof rels === 'object' && rels) {
