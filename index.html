@@ -781,7 +781,6 @@
                 netName: document.getElementById('myNetName').value.trim()
             };
             saveData();
-            showToast('个人信息已保存');
         }
 
         // ===== 辈分完善 - 动态关系人管理 =====
@@ -845,7 +844,6 @@
         function saveRelations() {
             appData.relations = collectRelations();
             saveData();
-            showToast('关系人信息已保存');
         }
 
         // 数据存储
@@ -924,12 +922,16 @@
             showLoginScreen();
         }
 
-        function saveData() {
+        async function saveData() {
             // 保存到本地
             localStorage.setItem(LOCAL_KEY, JSON.stringify(appData));
             // 保存到 GitHub
             if (currentUserName) {
-                saveToGitHub(currentUserName, appData);
+                showToast('⏳ 正在同步到云端...');
+                const ok = await saveToGitHub(currentUserName, appData);
+                if (ok) showToast('✅ 已保存并同步到云端');
+            } else {
+                showToast('✅ 已保存到本地');
             }
             updateDataPreview();
             updatePersonGrid();
@@ -1113,7 +1115,7 @@
                 } else {
                     const err = await resp.json();
                     console.error('Save failed:', err);
-                    showToast('保存失败: ' + (err.message || '未知错误'));
+                    showToast('❌ 同步失败: ' + (err.message || '未知错误'));
                     return false;
                 }
             } catch(e) {
