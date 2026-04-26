@@ -10,14 +10,14 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -26,30 +26,30 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             overflow: hidden;
         }
-        
+
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 24px;
             text-align: center;
         }
-        
+
         .header h1 {
             font-size: 24px;
             margin-bottom: 8px;
         }
-        
+
         .header p {
             opacity: 0.9;
             font-size: 14px;
         }
-        
+
         .tabs {
             display: flex;
             border-bottom: 1px solid #eee;
             overflow-x: auto;
         }
-        
+
         .tab {
             flex: 1;
             min-width: 80px;
@@ -63,33 +63,33 @@
             transition: all 0.3s;
             white-space: nowrap;
         }
-        
+
         .tab:hover {
             background: #f5f5f5;
         }
-        
+
         .tab.active {
             color: #667eea;
             border-bottom: 2px solid #667eea;
             font-weight: 600;
         }
-        
+
         .content {
             padding: 24px;
         }
-        
+
         .panel {
             display: none;
         }
-        
+
         .panel.active {
             display: block;
         }
-        
+
         .section {
             margin-bottom: 24px;
         }
-        
+
         .section-title {
             font-size: 16px;
             font-weight: 600;
@@ -98,24 +98,24 @@
             padding-bottom: 8px;
             border-bottom: 2px solid #667eea;
         }
-        
+
         .form-group {
             margin-bottom: 16px;
         }
-        
+
         .form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
         }
-        
+
         label {
             display: block;
             font-size: 14px;
             color: #555;
             margin-bottom: 6px;
         }
-        
+
         input, select {
             width: 100%;
             padding: 10px 12px;
@@ -124,12 +124,12 @@
             font-size: 14px;
             transition: border-color 0.3s;
         }
-        
+
         input:focus, select:focus {
             outline: none;
             border-color: #667eea;
         }
-        
+
         .btn {
             padding: 10px 20px;
             border: none;
@@ -138,41 +138,41 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
-        
+
         .btn-secondary {
             background: #f0f0f0;
             color: #333;
         }
-        
+
         .btn-secondary:hover {
             background: #e0e0e0;
         }
-        
+
         .btn-danger {
             background: #ff4757;
             color: white;
         }
-        
+
         .btn-danger:hover {
             background: #ff3344;
         }
-        
+
         .btn-group {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-        
+
         .person-card {
             background: #f8f9fa;
             border-radius: 12px;
@@ -180,13 +180,13 @@
             margin-bottom: 12px;
             border-left: 4px solid #667eea;
         }
-        
+
         .person-card h3 {
             font-size: 15px;
             margin-bottom: 12px;
             color: #333;
         }
-        
+
         .relation-badge {
             display: inline-block;
             background: #667eea;
@@ -196,7 +196,7 @@
             font-size: 12px;
             margin-left: 8px;
         }
-        
+
         /* 查询面板 */
         .query-section {
             background: #f8f9fa;
@@ -204,7 +204,7 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-        
+
         .query-result {
             background: white;
             border-radius: 8px;
@@ -212,27 +212,27 @@
             margin-top: 16px;
             border: 1px solid #e0e0e0;
         }
-        
+
         .result-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #eee;
         }
-        
+
         .result-item:last-child {
             border-bottom: none;
         }
-        
+
         .result-label {
             color: #666;
         }
-        
+
         .result-value {
             font-weight: 600;
             color: #333;
         }
-        
+
         /* 关系选择器 */
         .relation-grid {
             display: grid;
@@ -240,7 +240,7 @@
             gap: 8px;
             margin: 16px 0;
         }
-        
+
         .relation-btn {
             padding: 10px;
             border: 2px solid #e0e0e0;
@@ -250,63 +250,63 @@
             transition: all 0.3s;
             text-align: center;
         }
-        
+
         .relation-btn:hover {
             border-color: #667eea;
         }
-        
+
         .relation-btn.selected {
             border-color: #667eea;
             background: #667eea;
             color: white;
         }
-        
+
         /* 表格 */
         .table-wrapper {
             overflow-x: auto;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
         }
-        
+
         th, td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #eee;
         }
-        
+
         th {
             background: #f8f9fa;
             font-weight: 600;
             color: #333;
         }
-        
+
         /* 响应式 */
         @media (max-width: 600px) {
             body {
                 padding: 10px;
             }
-            
+
             .content {
                 padding: 16px;
             }
-            
+
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
+
             .btn-group {
                 flex-direction: column;
             }
-            
+
             .btn-group .btn {
                 width: 100%;
             }
         }
-        
+
         /* 提示 */
         .toast {
             position: fixed;
@@ -321,11 +321,11 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        
+
         .toast.show {
             opacity: 1;
         }
-        
+
         /* 模态框 */
         .modal {
             display: none;
@@ -340,11 +340,11 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
         .modal.show {
             display: flex;
         }
-        
+
         .modal-content {
             background: white;
             border-radius: 16px;
@@ -353,16 +353,16 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        
+
         .modal-header {
             padding: 20px;
             border-bottom: 1px solid #eee;
         }
-        
+
         .modal-body {
             padding: 20px;
         }
-        
+
         .modal-footer {
             padding: 20px;
             border-top: 1px solid #eee;
@@ -378,18 +378,18 @@
             <h1>社会关系配置</h1>
             <p>辈分称呼查询系统 <span id="headerUser" style="opacity:0.7;font-size:12px;"></span></p>
         </div>
-        
+
         <div class="tabs">
             <button class="tab active" data-tab="personal">个人信息</button>
             <button class="tab" data-tab="relations">辈分完善</button>
             <button class="tab" data-tab="query">辈分查询</button>
         </div>
-        
+
         <div class="content">
             <!-- 个人信息面板 -->
             <div class="panel active" id="personal">
                 <div class="section">
-                    <h2 class="section-title">基本信息（必填）</h2>
+                    <h2 class="section-title">基本信息(必填)</h2>
                     <div class="form-row">
                         <div class="form-group">
                             <label>名字</label>
@@ -406,26 +406,26 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>圈子代称（可选）</label>
+                            <label>圈子代称(可选)</label>
                             <input type="text" id="myNickname" placeholder="圈子里叫什么">
                         </div>
                         <div class="form-group">
-                            <label>网络称呼（可选）</label>
+                            <label>网络称呼(可选)</label>
                             <input type="text" id="myNetName" placeholder="网名/昵称">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="btn-group">
                     <button class="btn btn-primary" onclick="savePersonal()">保存信息</button>
                 </div>
             </div>
-            
+
             <!-- 辈分完善面板 -->
             <div class="panel" id="relations">
                 <div class="section">
                     <h2 class="section-title">完善你的辈分</h2>
-                    <p style="font-size:13px;color:#999;margin-bottom:16px;">填写辅助信息，帮助系统更准确地计算辈分</p>
+                    <p style="font-size:13px;color:#999;margin-bottom:16px;">填写辅助信息,帮助系统更准确地计算辈分</p>
                     <div id="relationList"></div>
                     <button class="btn btn-secondary" onclick="addRelationEntry()" style="width:100%;margin-top:8px;">+ 添加关系人</button>
                 </div>
@@ -433,7 +433,7 @@
                     <button class="btn btn-primary" onclick="saveRelations()">保存关系人</button>
                 </div>
             </div>
-            
+
             <!-- 辈分查询面板 -->
             <div class="panel" id="query">
                 <div class="query-section">
@@ -445,16 +445,16 @@
                         <button class="btn btn-primary" onclick="queryByName()" style="height: 42px; min-width: 80px;">查询</button>
                     </div>
                 </div>
-                
+
                 <div class="query-result" id="queryResult">
                     <p style="color: #999; text-align: center;">输入名字开始查询</p>
                 </div>
             </div>
-            
+
 
         </div>
     </div>
-    
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -464,10 +464,10 @@
             relations: {},
             children: []
         };
-        
+
         // 当前用户名
         let currentUserName = localStorage.getItem('poi_currentUser') || '';
-        
+
         // 称呼数据
         const relationTitles = {
             // 长辈
@@ -498,7 +498,7 @@
             'nephew_sister': { title: '外甥', call: '外甥', gender: '男' },
             'niece_sister': { title: '外甥女', call: '外甥女', gender: '女' }
         };
-        
+
         // 关系查询用
         const queryRelations = {
             '父亲': { key: 'father', call: '爸爸' },
@@ -526,8 +526,8 @@
             '外甥': { key: 'nephew_sister', call: '外甥' },
             '外甥女': { key: 'niece_sister', call: '外甥女' }
         };
-        
-        // 关系映射表（关系key -> 输出信息）
+
+        // 关系映射表(关系key -> 输出信息)
         const relationOutput = {
             'father': { relation: '父子关系', callHim: '爸爸', callMeMale: '儿子', callMeFemale: '女儿' },
             'mother': { relation: '母子关系', callHim: '妈妈', callMeMale: '儿子', callMeFemale: '女儿' },
@@ -540,19 +540,19 @@
             'child_male': { relation: '父子关系', callHim: '儿子', callMeMale: '爸爸', callMeFemale: '妈妈' },
             'child_female': { relation: '母女关系', callHim: '女儿', callMeMale: '爸爸', callMeFemale: '妈妈' }
         };
-        
+
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             initTabs();
             if (currentUserName) {
-                // 已有用户，自动加载
+                // 已有用户,自动加载
                 selectUser(currentUserName);
             } else {
-                // 新用户，选择身份
+                // 新用户,选择身份
                 showLoginScreen();
             }
         });
-        
+
         // 标签页切换
         function initTabs() {
             document.querySelectorAll('.tab').forEach(tab => {
@@ -564,11 +564,11 @@
                 });
             });
         }
-        
-        // 更新已完成（关系人网格已移除）
+
+        // 更新已完成(关系人网格已移除)
         function updatePersonGrid() {}
-        
-        // 特殊规则（彩蛋）- 动态生成
+
+        // 特殊规则(彩蛋)- 动态生成
         function getSpecialRules() {
             const g = (appData.personal && appData.personal.gender) || '男';
             return {
@@ -576,26 +576,26 @@
                     relation: '义父义母的亲兄弟',
                     callHim: '义伯/义叔',
                     callMe: '义侄',
-                    chain: ['叶飘', '→ 义父/义母的亲兄弟', '→ 你（义侄）'],
-                    note: '这是隐藏规则：叶飘是你义父义母的亲兄弟'
+                    chain: ['叶飘', '→ 义父/义母的亲兄弟', '→ 你(义侄)'],
+                    note: '这是隐藏规则:叶飘是你义父义母的亲兄弟'
                 },
                 '冬贝利': {
                     relation: '祖孙关系',
                     callHim: '爷爷',
                     callMe: g === '男' ? '孙子' : '孙女',
                     chain: ['冬贝利', '→ 爷爷', '→ 你'],
-                    note: '隐藏规则：冬贝利是你的爷爷'
+                    note: '隐藏规则:冬贝利是你的爷爷'
                 },
                 '陈睿': {
                     relation: '叔侄关系',
                     callHim: '叔叔',
                     callMe: g === '男' ? '侄子' : '侄女',
-                    chain: ['陈睿', '→ 叔叔（所有人的叔叔）', '→ 你'],
-                    note: '隐藏规则：陈睿是所有人的叔叔'
+                    chain: ['陈睿', '→ 叔叔(所有人的叔叔)', '→ 你'],
+                    note: '隐藏规则:陈睿是所有人的叔叔'
                 }
             };
         }
-        
+
         // 默认平辈规则 - 动态生成
         function getDefaultPeerRule() {
             const g = (appData.personal && appData.personal.gender) || '男';
@@ -604,10 +604,10 @@
                 callHim: g === '男' ? '兄弟/姐妹' : '姐妹/兄弟',
                 callMe: g === '男' ? '兄弟/姐妹' : '姐妹/兄弟',
                 chain: ['对方', '→ 叔叔是陈睿', '→ 陈睿也是你叔叔', '→ 所以你们是平辈'],
-                note: '因为对方的叔叔是陈睿，陈睿也是你叔叔，所以你们是平辈'
+                note: '因为对方的叔叔是陈睿,陈睿也是你叔叔,所以你们是平辈'
             };
         }
-        
+
         // 按名字查询
         async function queryByName() {
             const name = document.getElementById('queryName').value.trim();
@@ -615,14 +615,14 @@
                 showToast('请输入名字');
                 return;
             }
-            
+
             // 先检查特殊规则
             const specialRules = getSpecialRules();
             if (specialRules[name]) {
                 showQueryResult({ name, ...specialRules[name], isSpecial: true });
                 return;
             }
-            
+
             // 查找匹配的关系人
             const rels = appData.relations;
             let found = null;
@@ -633,7 +633,7 @@
                 const match = Object.values(rels).find(r => r && r.name === name);
                 if (match) found = { name: match.name, relation: match.relation || '' };
             }
-            
+
             if (found && found.relation) {
                 const mapped = queryRelations[found.relation];
                 if (mapped) {
@@ -649,7 +649,7 @@
                         return;
                     }
                 }
-                // 自定义关系，直接显示
+                // 自定义关系,直接显示
                 showQueryResult({
                     name: found.name,
                     relation: found.relation,
@@ -658,7 +658,7 @@
                 });
                 return;
             }
-            
+
             // 查找是否是其他注册用户
             if (allUsersCache[name]) {
                 const otherData = await loadOtherUserData(name);
@@ -670,24 +670,24 @@
                         callHim: name,
                         callMe: currentUserName,
                         relation: `${name} 的资料`,
-                        chain: [`${otherGender === '男' ? '👦' : otherGender === '女' ? '👧' : '👤'} ${name}（${otherGender}）`, `→ 代称：${otherPersonal.nickname || '无'}`],
+                        chain: [`${otherGender === '男' ? '👦' : otherGender === '女' ? '👧' : '👤'} ${name}(${otherGender})`, `→ 代称:${otherPersonal.nickname || '无'}`],
                         note: `${name} 是注册用户`,
                         isCrossUser: true
                     });
                     return;
                 }
             }
-            
+
             // 未找到
             const defaultRule = getDefaultPeerRule();
             showQueryResult({ name, ...defaultRule, isDefault: true });
         }
-        
+
         // 查询指定关系人
         function queryPerson(p) {
             showQueryResult(p);
         }
-        
+
         // 显示查询结果
         function showQueryResult(person) {
             const resultDiv = document.getElementById('queryResult');
@@ -695,7 +695,7 @@
             const myName = appData.personal.name || '我';
             const queryName = person.name || '未知';
             const pGender = person.gender || '未知';
-            
+
             let relationType = '';
             let callHim = '';
             let callMe = '';
@@ -704,8 +704,8 @@
             let isSpecial = person.isSpecial || false;
             let isDefault = person.isDefault || false;
             let isCrossUser = person.isCrossUser || false;
-            
-            // 特殊规则/跨用户/默认规则，直接用预设值
+
+            // 特殊规则/跨用户/默认规则,直接用预设值
             if (person.callHim && person.callMe) {
                 relationType = person.relation;
                 callHim = person.callHim;
@@ -716,12 +716,12 @@
                 callHim = queryName;
                 callMe = myName;
                 const genderIcon = pGender === '男' ? '👦' : pGender === '女' ? '👧' : '👤';
-                chain = [`${genderIcon} ${queryName}（${pGender}）`, `→ ${myName}（${myGender}）`];
+                chain = [`${genderIcon} ${queryName}(${pGender})`, `→ ${myName}(${myGender})`];
                 note = '这是你配置的关系人';
             }
-            
+
             const personName = person.name || appData.relations[person.key]?.name || '未知';
-            
+
             // 构建特殊规则标签
             let specialTag = '';
             if (isSpecial) {
@@ -729,7 +729,7 @@
             } else if (isDefault) {
                 specialTag = '<span style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">🔗 默认平辈</span>';
             }
-            
+
             // 构建关系链条HTML
             let chainHtml = '';
             if (chain && chain.length > 0) {
@@ -740,7 +740,7 @@
                         return `<div style="display:flex;align-items:center;color:#333;font-weight:600;">${item}</div>`;
                     }
                 }).join('');
-                
+
                 chainHtml = `
                     <div class="result-item" style="flex-direction: column; align-items: stretch;">
                         <span class="result-label" style="margin-bottom: 8px;">📎 关系链条</span>
@@ -750,7 +750,7 @@
                     </div>
                 `;
             }
-            
+
             // 构建备注
             let noteHtml = '';
             if (note) {
@@ -761,7 +761,7 @@
                     </div>
                 `;
             }
-            
+
             resultDiv.innerHTML = `
                 <div class="result-item">
                     <span class="result-label">姓名</span>
@@ -782,10 +782,10 @@
                 ${chainHtml}
                 ${noteHtml}
             `;
-            
-            showToast(isSpecial ? '🎉 触发隐藏规则！' : isDefault ? '🔗 应用默认平辈规则' : '查询成功');
+
+            showToast(isSpecial ? '🎉 触发隐藏规则!' : isDefault ? '🔗 应用默认平辈规则' : '查询成功');
         }
-        
+
         // 保存个人信息
         function savePersonal() {
             appData.personal = {
@@ -798,11 +798,11 @@
             saveData();
             showToast('个人信息已保存');
         }
-        
+
         // ===== 辈分完善 - 动态关系人管理 =====
         const RELATION_OPTIONS = ['父亲', '母亲', '爷爷', '奶奶', '配偶'];
         let relCount = 0;
-        
+
         function addRelationEntry(name, relation, otherRelation, gender) {
             relCount++;
             const id = relCount;
@@ -813,83 +813,69 @@
             div.style.borderLeft = '4px solid #667eea';
             div.innerHTML = `
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                    <input type="text" id="relName${id}" placeholder="${isFirst ? '填的越多查得越快' : '你和想查询的人最可能有关系的是谁？'}" 
-                        value="${name || ''}" 
+                    <input type="text" id="relName${id}" placeholder="${isFirst ? '填的越多查得越快' : '你和想查询的人最可能有关系的是谁?'}"
+                        value="${name || ''}"
                         style="flex:1;min-width:120px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-                    <select id="relGender${id}" 
+                    <select id="relGender${id}"
                         style="padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:60px;">
                         <option value="">性别</option>
                         <option value="男" ${(typeof gender !== 'undefined' && gender === '男') ? 'selected' : ''}>男</option>
                         <option value="女" ${(typeof gender !== 'undefined' && gender === '女') ? 'selected' : ''}>女</option>
                     </select>
-                    <select id="relType${id}" onchange="toggleOtherInput(${id})" 
-                        style="padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:80px;">
-                        <option value="">和你的关系</option>
-                        ${RELATION_OPTIONS.map(r => `<option value="${r}" ${relation === r ? 'selected' : ''}>${r}</option>`).join('')}
-                        <option value="其他" ${relation === '其他' || (relation && !RELATION_OPTIONS.includes(relation)) ? 'selected' : ''}>其他</option>
-                    </select>
-                    <input type="text" id="relOther${id}" placeholder="输入关系" value="${(relation && !RELATION_OPTIONS.includes(relation)) ? relation : (otherRelation || '')}" 
-                        style="display:${(relation === '其他' || (relation && !RELATION_OPTIONS.includes(relation))) ? 'inline-block' : 'none'};padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;min-width:80px;">
+                    <input type="text" id="relRelation${id}" placeholder="和你的关系" value="${relation || ''}"
+                        style="flex:1;min-width:80px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
                     <button class="btn btn-danger" style="padding:8px 12px;font-size:12px;" onclick="removeRelEntry(${id})">✕</button>
                 </div>
             `;
             document.getElementById('relationList').appendChild(div);
         }
-        
-        function toggleOtherInput(id) {
-            const sel = document.getElementById(`relType${id}`);
-            const other = document.getElementById(`relOther${id}`);
-            other.style.display = sel.value === '其他' ? 'inline-block' : 'none';
-            if (sel.value !== '其他') other.value = '';
-        }
-        
+
         function removeRelEntry(id) {
             const el = document.getElementById(`rel-${id}`);
             if (el) el.remove();
         }
-        
+
         function collectRelations() {
             const relations = [];
             document.querySelectorAll('#relationList .person-card').forEach(card => {
                 const id = card.id.replace('rel-', '');
                 const name = document.getElementById(`relName${id}`)?.value.trim();
                 const gender = document.getElementById(`relGender${id}`)?.value || '';
-                const type = document.getElementById(`relType${id}`)?.value || '';
-                const other = document.getElementById(`relOther${id}`)?.value.trim();
+                const relation = document.getElementById(`relRelation${id}`)?.value.trim();
                 if (name) {
                     relations.push({ 
                         name, 
                         gender,
-                        relation: type === '其他' ? (other || '其他') : type
+                        relation: relation || ''
                     });
                 }
             });
             return relations;
         }
-        
+
         function saveRelations() {
             appData.relations = collectRelations();
             saveData();
             showToast('关系人信息已保存');
         }
-        
+
         // 数据存储
         const LOCAL_KEY = 'familyRelations_local';
-        
+
         // 显示登录/选择身份界面
         async function showLoginScreen() {
             const existing = document.getElementById('loginModal');
             if (existing) { existing.classList.add('show'); return; }
-            
+
             // 获取已有用户列表
             const users = await listAllUsers();
             let userOptions = '';
             if (users.length > 0) {
-                userOptions = '<div style="margin-top:16px;"><p style="font-size:13px;color:#666;margin-bottom:8px;">已有用户：</p>' +
+                userOptions = '<div style="margin-top:16px;"><p style="font-size:13px;color:#666;margin-bottom:8px;">已有用户:</p>' +
                     users.map(u => `<button class="btn btn-secondary" style="margin:4px;" onclick="selectUser('${u}')">${u}</button>`).join('') +
                     '</div>';
             }
-            
+
             const m = document.createElement('div');
             m.className = 'modal show';
             m.id = 'loginModal';
@@ -905,50 +891,50 @@
                 </div>
             `;
             document.body.appendChild(m);
-            
-            // 如果之前有登录过，自动填充
+
+            // 如果之前有登录过,自动填充
             if (currentUserName) {
                 document.getElementById('loginName').value = currentUserName;
             }
         }
-        
+
         async function selectUser(name) {
             const userName = name || document.getElementById('loginName').value.trim();
             if (!userName) { showToast('请输入名字'); return; }
-            
+
             currentUserName = userName;
             localStorage.setItem('poi_currentUser', userName);
-            
+
             // 关闭登录弹窗
             const modal = document.getElementById('loginModal');
             if (modal) modal.remove();
-            
+
             // 从 GitHub 加载数据
             const data = await loadFromGitHub(userName);
             if (data) {
                 appData = data;
             } else {
-                // 新用户，检查本地是否有数据
+                // 新用户,检查本地是否有数据
                 const localData = localStorage.getItem(LOCAL_KEY);
                 if (localData) {
                     appData = JSON.parse(localData);
                 }
             }
-            
+
             loadDataToForm();
             updateDataPreview();
             updatePersonGrid();
             // 更新头部用户显示
             const headerUser = document.getElementById('headerUser');
             if (headerUser) headerUser.textContent = `| 👤 ${userName}`;
-            showToast(`欢迎，${userName}！`);
+            showToast(`欢迎,${userName}!`);
         }
-        
+
         // 切换用户
         async function switchUser() {
             showLoginScreen();
         }
-        
+
         function saveData() {
             // 保存到本地
             localStorage.setItem(LOCAL_KEY, JSON.stringify(appData));
@@ -959,8 +945,8 @@
             updateDataPreview();
             updatePersonGrid();
         }
-        
-        // 从本地加载数据（无网络回退）
+
+        // 从本地加载数据(无网络回退)
         function loadDataFromLocal() {
             const localData = localStorage.getItem(LOCAL_KEY);
             if (localData) {
@@ -968,13 +954,13 @@
             }
             loadDataToForm();
         }
-        
+
         // 将 appData 填充到表单
         function loadDataToForm() {
             if (appData.personal) {
                 document.getElementById('myName').value = appData.personal.name || '';
                 document.getElementById('myGender').value = appData.personal.gender || '';
-    
+
                 document.getElementById('myNickname').value = appData.personal.nickname || '';
                 document.getElementById('myNetName').value = appData.personal.netName || '';
             }
@@ -983,7 +969,7 @@
             if (Array.isArray(rels) && rels.length > 0) {
                 rels.forEach(r => {
                     if (r && r.name) {
-                        addRelationEntry(r.name, r.relation, r.relation === '其他' ? r.relation : '', r.gender || '');
+                        addRelationEntry(r.name, r.relation, '', r.gender || '');
                     }
                 });
             } else if (typeof rels === 'object' && rels) {
@@ -995,7 +981,7 @@
                 addRelationEntry();
             }
         }
-        
+
         // 导出数据
         function exportData() {
             const dataStr = JSON.stringify(appData, null, 2);
@@ -1008,12 +994,12 @@
             URL.revokeObjectURL(url);
             showToast('数据已导出');
         }
-        
+
         // 导入数据
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
@@ -1022,16 +1008,16 @@
                     loadData();
                     showToast('数据导入成功');
                 } catch (err) {
-                    showToast('导入失败：文件格式错误');
+                    showToast('导入失败:文件格式错误');
                 }
             };
             reader.readAsText(file);
             event.target.value = '';
         }
-        
+
         // 清空数据
         function clearData() {
-            if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+            if (confirm('确定要清空所有数据吗?此操作不可恢复!')) {
                 localStorage.removeItem(LOCAL_KEY);
                 appData = { personal: {}, relations: {}, children: [] };
                 if (currentUserName) {
@@ -1040,27 +1026,27 @@
                 location.reload();
             }
         }
-        
+
         // 更新数据预览
         function updateDataPreview() {
-            // 数据预览已移除，仅保留缓存更新
+            // 数据预览已移除,仅保留缓存更新
         }
-        
+
         // ========== GitHub 多用户存储 ==========
         const REPO = 'leaffloat/poi';
         const GITHUB_API = 'https://api.github.com';
         const JSDELIVR = 'https://cdn.jsdelivr.net/gh';
         const TOKEN_KEY = 'poi_github_token';
         let allUsersCache = {};
-        
-        // 默认密钥（拆分混淆，避免 GitHub 扫描）
+
+        // 默认密钥(拆分混淆,避免 GitHub 扫描)
         const _dk = ['ghp_K9zU','AXJIdBlom7','AiGZTHR7cb','Hndcyl09Ct9I'].join('');
-        
+
         // 获取 token
         function getToken() {
             return localStorage.getItem(TOKEN_KEY) || _dk;
         }
-        
+
         // GitHub API 请求
         async function githubAPI(path, method, body) {
             const token = getToken();
@@ -1074,11 +1060,11 @@
             const resp = await fetch(GITHUB_API + path, opts);
             return resp;
         }
-        
+
         // 从 GitHub 读取用户数据
         async function loadFromGitHub(userName) {
             try {
-                // 先试 jsDelivr（快，但有缓存）
+                // 先试 jsDelivr(快,但有缓存)
                 const url = `${JSDELIVR}/${REPO}@main/data/${encodeURIComponent(userName)}.json`;
                 const resp = await fetch(url + '?t=' + Date.now());
                 if (resp.ok) {
@@ -1087,8 +1073,8 @@
             } catch(e) {
                 console.warn('jsDelivr read failed, trying API:', e);
             }
-            
-            // 回退到 GitHub API（实时，但有速率限制）
+
+            // 回退到 GitHub API(实时,但有速率限制)
             try {
                 const resp = await githubAPI(`/repos/${REPO}/contents/data/${encodeURIComponent(userName)}.json`);
                 if (resp.ok) {
@@ -1101,7 +1087,7 @@
             }
             return null;
         }
-        
+
         // 保存用户数据到 GitHub
         async function saveToGitHub(userName, data) {
             const token = getToken();
@@ -1110,26 +1096,26 @@
                 showTokenModal();
                 return false;
             }
-            
+
             const filePath = `data/${encodeURIComponent(userName)}.json`;
             const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-            
+
             try {
-                // 获取当前文件的 SHA（如果存在）
+                // 获取当前文件的 SHA(如果存在)
                 let sha = null;
                 const checkResp = await githubAPI(`/repos/${REPO}/contents/${filePath}`);
                 if (checkResp.ok) {
                     const fileInfo = await checkResp.json();
                     sha = fileInfo.sha;
                 }
-                
+
                 // 创建或更新文件
                 const body = {
                     message: `更新 ${userName} 的数据`,
                     content: content
                 };
                 if (sha) body.sha = sha;
-                
+
                 const resp = await githubAPI(`/repos/${REPO}/contents/${filePath}`, 'PUT', body);
                 if (resp.ok) {
                     // 更新用户列表
@@ -1147,16 +1133,16 @@
                 return false;
             }
         }
-        
+
         // 更新用户索引
         async function updateUserIndex(userName) {
             const token = getToken();
             if (!token) return;
-            
+
             try {
                 let indexData = { users: [] };
                 let sha = null;
-                
+
                 const checkResp = await githubAPI(`/repos/${REPO}/contents/data/index.json`);
                 if (checkResp.ok) {
                     const fileInfo = await checkResp.json();
@@ -1164,7 +1150,7 @@
                     const content = atob(fileInfo.content.replace(/\n/g, ''));
                     indexData = JSON.parse(decodeURIComponent(escape(content)));
                 }
-                
+
                 if (!indexData.users.includes(userName)) {
                     indexData.users.push(userName);
                     const content = btoa(unescape(encodeURIComponent(JSON.stringify(indexData, null, 2))));
@@ -1176,7 +1162,7 @@
                 console.warn('Update index failed:', e);
             }
         }
-        
+
         // 获取所有用户列表
         async function listAllUsers() {
             try {
@@ -1186,7 +1172,7 @@
                 if (resp.ok) {
                     const data = await resp.json();
                     allUsersCache = {};
-                    // 异步加载每个用户的个人数据（仅名字和性别）
+                    // 异步加载每个用户的个人数据(仅名字和性别)
                     if (data.users) {
                         for (const name of data.users) {
                             allUsersCache[name] = { personal: { name } };
@@ -1197,7 +1183,7 @@
             } catch(e) {
                 console.warn('jsDelivr index failed:', e);
             }
-            
+
             // 回退到 GitHub API
             try {
                 const resp = await githubAPI(`/repos/${REPO}/contents/data`);
@@ -1215,8 +1201,8 @@
             }
             return [];
         }
-        
-        // 加载其他用户数据（用于跨用户查询）
+
+        // 加载其他用户数据(用于跨用户查询)
         async function loadOtherUserData(userName) {
             if (allUsersCache[userName] && allUsersCache[userName].personal && allUsersCache[userName].personal.gender) {
                 return allUsersCache[userName]; // 已缓存完整数据
@@ -1227,7 +1213,7 @@
             }
             return data;
         }
-        
+
         // 设置密钥弹窗
         function showTokenModal() {
             const modal = document.getElementById('tokenModal');
@@ -1240,7 +1226,7 @@
                         <div class="modal-header"><h3>⚙️ 设置写入密钥</h3></div>
                         <div class="modal-body">
                             <p style="margin-bottom:12px;color:#666;font-size:13px;">需要 GitHub Personal Access Token 才能保存数据到云端。</p>
-                            <p style="margin-bottom:12px;color:#666;font-size:13px;">找群主要一个就行，输入一次以后就不用再输了。</p>
+                            <p style="margin-bottom:12px;color:#666;font-size:13px;">找群主要一个就行,输入一次以后就不用再输了。</p>
                             <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxx" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
                         </div>
                         <div class="modal-footer">
@@ -1254,7 +1240,7 @@
             document.getElementById('tokenInput').value = getToken();
             document.getElementById('tokenModal').classList.add('show');
         }
-        
+
         function saveToken() {
             const token = document.getElementById('tokenInput').value.trim();
             if (token) {
@@ -1263,7 +1249,7 @@
                 showToast('密钥已保存');
             }
         }
-        
+
         // 提示
         function showToast(msg) {
             const toast = document.getElementById('toast');
