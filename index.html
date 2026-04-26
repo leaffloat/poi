@@ -800,11 +800,58 @@
             });
         }
         
+        // 特殊规则（彩蛋）- 动态生成
+        function getSpecialRules() {
+            const g = (appData.personal && appData.personal.gender) || '男';
+            return {
+                '叶飘': {
+                    relation: '义父义母的亲兄弟',
+                    callHim: '义伯/义叔',
+                    callMe: '义侄',
+                    chain: ['叶飘', '→ 义父/义母的亲兄弟', '→ 你（义侄）'],
+                    note: '这是隐藏规则：叶飘是你义父义母的亲兄弟'
+                },
+                '冬贝利': {
+                    relation: '祖孙关系',
+                    callHim: '爷爷',
+                    callMe: g === '男' ? '孙子' : '孙女',
+                    chain: ['冬贝利', '→ 爷爷', '→ 你'],
+                    note: '隐藏规则：冬贝利是你的爷爷'
+                },
+                '陈睿': {
+                    relation: '叔侄关系',
+                    callHim: '叔叔',
+                    callMe: g === '男' ? '侄子' : '侄女',
+                    chain: ['陈睿', '→ 叔叔（所有人的叔叔）', '→ 你'],
+                    note: '隐藏规则：陈睿是所有人的叔叔'
+                }
+            };
+        }
+        
+        // 默认平辈规则 - 动态生成
+        function getDefaultPeerRule() {
+            const g = (appData.personal && appData.personal.gender) || '男';
+            return {
+                relation: '平辈关系',
+                callHim: g === '男' ? '兄弟/姐妹' : '姐妹/兄弟',
+                callMe: g === '男' ? '兄弟/姐妹' : '姐妹/兄弟',
+                chain: ['对方', '→ 叔叔是陈睿', '→ 陈睿也是你叔叔', '→ 所以你们是平辈'],
+                note: '因为对方的叔叔是陈睿，陈睿也是你叔叔，所以你们是平辈'
+            };
+        }
+        
         // 按名字查询
         function queryByName() {
             const name = document.getElementById('queryName').value.trim();
             if (!name) {
                 showToast('请输入名字');
+                return;
+            }
+            
+            // 先检查特殊规则
+            const specialRules = getSpecialRules();
+            if (specialRules[name]) {
+                showQueryResult({ name, ...specialRules[name], isSpecial: true });
                 return;
             }
             
@@ -827,12 +874,13 @@
                 });
             }
             
-            if (!found) {
-                document.getElementById('queryResult').innerHTML = `<p style="color: #ff4757; text-align: center;">未找到"${name}"，请先在「关系人」面板配置</p>`;
-                return;
+            if (found) {
+                showQueryResult(found);
+            } else {
+                // 未找到 - 显示平辈规则
+                const defaultRule = getDefaultPeerRule();
+                showQueryResult({ name, ...defaultRule, isDefault: true });
             }
-            
-            showQueryResult(found);
         }
         
         // 查询指定关系人
@@ -848,62 +896,120 @@
             let relationType = '';
             let callHim = '';
             let callMe = '';
+            let chain = person.chain || null;
+            let note = person.note || '';
+            let isSpecial = person.isSpecial || false;
+            let isDefault = person.isDefault || false;
             
-            // 根据关系key确定输出
-            switch (person.key) {
-                case 'father':
-                    relationType = '父子关系';
-                    callHim = '爸爸';
-                    callMe = myGender === '男' ? '儿子' : '女儿';
-                    break;
-                case 'mother':
-                    relationType = myGender === '男' ? '母子关系' : '母女关系';
-                    callHim = '妈妈';
-                    callMe = myGender === '男' ? '儿子' : '女儿';
-                    break;
-                case 'grandfather_paternal':
-                    relationType = '祖孙关系';
-                    callHim = '爷爷';
-                    callMe = myGender === '男' ? '孙子' : '孙女';
-                    break;
-                case 'grandmother_paternal':
-                    relationType = '祖孙关系';
-                    callHim = '奶奶';
-                    callMe = myGender === '男' ? '孙子' : '孙女';
-                    break;
-                case 'spouse':
-                    relationType = '夫妻关系';
-                    if (person.gender === '男') {
-                        callHim = '老公';
-                        callMe = '老婆';
-                    } else {
-                        callHim = '老婆';
-                        callMe = '老公';
-                    }
-                    break;
-                case 'child':
-                    if (person.gender === '男') {
-                        relationType = myGender === '男' ? '父子关系' : '母子关系';
-                        callHim = '儿子';
-                        callMe = myGender === '男' ? '爸爸' : '妈妈';
-                    } else {
-                        relationType = myGender === '男' ? '父女关系' : '母女关系';
-                        callHim = '女儿';
-                        callMe = myGender === '男' ? '爸爸' : '妈妈';
-                    }
-                    break;
-                default:
-                    relationType = '亲属关系';
-                    callHim = person.relation;
-                    callMe = '我';
+            // 如果是特殊规则/默认规则，直接使用预设值
+            if (person.callHim && person.callMe) {
+                relationType = person.relation;
+                callHim = person.callHim;
+                callMe = person.callMe;
+            } else {
+                // 根据关系key确定输出
+                switch (person.key) {
+                    case 'father':
+                        relationType = '父子关系';
+                        callHim = '爸爸';
+                        callMe = myGender === '男' ? '儿子' : '女儿';
+                        chain = [person.name || '父亲', '→ 爸爸', '→ 你（' + callMe + '）'];
+                        break;
+                    case 'mother':
+                        relationType = myGender === '男' ? '母子关系' : '母女关系';
+                        callHim = '妈妈';
+                        callMe = myGender === '男' ? '儿子' : '女儿';
+                        chain = [person.name || '母亲', '→ 妈妈', '→ 你（' + callMe + '）'];
+                        break;
+                    case 'grandfather_paternal':
+                        relationType = '祖孙关系';
+                        callHim = '爷爷';
+                        callMe = myGender === '男' ? '孙子' : '孙女';
+                        chain = [person.name || '祖父', '→ 爷爷', '→ 你（' + callMe + '）'];
+                        break;
+                    case 'grandmother_paternal':
+                        relationType = '祖孙关系';
+                        callHim = '奶奶';
+                        callMe = myGender === '男' ? '孙子' : '孙女';
+                        chain = [person.name || '祖母', '→ 奶奶', '→ 你（' + callMe + '）'];
+                        break;
+                    case 'spouse':
+                        relationType = '夫妻关系';
+                        if (person.gender === '男') {
+                            callHim = '老公';
+                            callMe = '老婆';
+                        } else {
+                            callHim = '老婆';
+                            callMe = '老公';
+                        }
+                        chain = [person.name || '配偶', '→ ' + callHim, '→ 你（' + callMe + '）'];
+                        break;
+                    case 'child':
+                        if (person.gender === '男') {
+                            relationType = myGender === '男' ? '父子关系' : '母子关系';
+                            callHim = '儿子';
+                            callMe = myGender === '男' ? '爸爸' : '妈妈';
+                        } else {
+                            relationType = myGender === '男' ? '父女关系' : '母女关系';
+                            callHim = '女儿';
+                            callMe = myGender === '男' ? '爸爸' : '妈妈';
+                        }
+                        chain = [person.name || '子女', '→ ' + callHim, '→ 你（' + callMe + '）'];
+                        break;
+                    default:
+                        relationType = '亲属关系';
+                        callHim = person.relation;
+                        callMe = '我';
+                        chain = [person.name, '→ ' + callHim];
+                }
             }
             
             const personName = person.name || appData.relations[person.key]?.name || '未知';
             
+            // 构建特殊规则标签
+            let specialTag = '';
+            if (isSpecial) {
+                specialTag = '<span style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">✨ 隐藏规则</span>';
+            } else if (isDefault) {
+                specialTag = '<span style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px;">🔗 默认平辈</span>';
+            }
+            
+            // 构建关系链条HTML
+            let chainHtml = '';
+            if (chain && chain.length > 0) {
+                const chainItems = chain.map((item, i) => {
+                    if (item.startsWith('→')) {
+                        return `<div style="display:flex;align-items:center;color:#764ba2;font-weight:500;">${item}</div>`;
+                    } else {
+                        return `<div style="display:flex;align-items:center;color:#333;font-weight:600;">${item}</div>`;
+                    }
+                }).join('');
+                
+                chainHtml = `
+                    <div class="result-item" style="flex-direction: column; align-items: stretch;">
+                        <span class="result-label" style="margin-bottom: 8px;">📎 关系链条</span>
+                        <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px;">
+                            ${chainItems}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 构建备注
+            let noteHtml = '';
+            if (note) {
+                noteHtml = `
+                    <div class="result-item" style="background: #fff8e1;">
+                        <span class="result-label">💡 说明</span>
+                        <span class="result-value" style="color: #f57c00;">${note}</span>
+                    </div>
+                `;
+            }
+            
             resultDiv.innerHTML = `
                 <div class="result-item">
                     <span class="result-label">姓名</span>
-                    <span class="result-value">${personName}</span>
+                    <span class="result-value">${personName} ${specialTag}</span>
                 </div>
                 <div class="result-item">
                     <span class="result-label">关系类型</span>
@@ -917,9 +1023,11 @@
                     <span class="result-label">他/她该叫我</span>
                     <span class="result-value" style="color: #764ba2; font-size: 18px;">${callMe}</span>
                 </div>
+                ${chainHtml}
+                ${noteHtml}
             `;
             
-            showToast('查询成功');
+            showToast(isSpecial ? '🎉 触发隐藏规则！' : isDefault ? '🔗 应用默认平辈规则' : '查询成功');
         }
         
         // 保存个人信息
