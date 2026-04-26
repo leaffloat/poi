@@ -1,0 +1,36 @@
+{
+  "personal": {
+    "name": "",
+    "gender": "男",
+    "city": "",
+    "nickname": "",
+    "netName": ""
+  },
+  "relations": {
+    "father": {
+      "name": "",
+      "gender": "男",
+      "city": "",
+      "nickname": ""
+    },
+    "mother": {
+      "name": "",
+      "gender": "女",
+      "city": "",
+      "nickname": ""
+    },
+    "grandfather_paternal": {
+      "name": "",
+      "gender": "男"
+    },
+    "grandmother_paternal": {
+      "name": "",
+      "gender": "女"
+    },
+    "spouse": {
+      "name": "",
+      "gender": ""
+    }
+  },
+  "children": []
+}
